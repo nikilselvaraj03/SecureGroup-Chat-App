@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
 import LoginScreen from './screens/LoginScreen';
 import RegistrationScreen from './screens/RegistrationScreen';
+import { auth } from './firebase';
 import Home from './screens/Home'
 const Stack = createNativeStackNavigator();
 
@@ -17,12 +18,17 @@ export default function App() {
   }
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen options={{headerShown:false}} name="Login" component={LoginScreen} />
-        <Stack.Screen options={{headerShown:false}} name="Register" component={RegistrationScreen} />
-        <Stack.Screen options={{headerShown:false}} name="Home" component={Home} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator>
+      {auth.token ? (
+        <Stack.Screen name="Home" options={{headerShown:false}} component={Home} />
+      ) : (
+        <>
+          <Stack.Screen name="Login" options={{headerShown:false}} component={LoginScreen} />
+          <Stack.Screen name="SignUp" options={{headerShown:false}} component={RegistrationScreen} />
+        </>
+      )}
+    </Stack.Navigator>
+  </NavigationContainer>
   );
 }
 

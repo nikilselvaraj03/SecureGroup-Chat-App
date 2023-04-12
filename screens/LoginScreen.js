@@ -2,9 +2,28 @@ import { Image,StatusBar, KeyboardAvoidingView, StyleSheet, Text, TextInput, Vie
 import React, { useEffect, useState } from 'react';
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
+import { auth } from '../firebase';
+import { useNavigation } from '@react-navigation/native';
 const LoginScreen = () => {
+    const navigation = useNavigation();
     const [email,setEmail] = useState('');
     const [password,setPassword] =  useState('')
+    const handleSignin= () => {
+            auth.signInWithEmailAndPassword(email,password).then(
+                
+            ).catch(error => {alert(error.message)})
+        }
+        useEffect(() =>{
+           const unsubscribe = auth.onAuthStateChanged(user => {
+                if(user) {
+                    navigation.navigate('Home')
+                }
+            })
+            return unsubscribe
+        })
+        const handleSignUpClick = () => {
+            navigation.navigate('SignUp')
+        }
     return (
         <View style={styles.loginContainer}>
          <StatusBar barStyle="light-content" /> 
@@ -13,7 +32,7 @@ const LoginScreen = () => {
           <KeyboardAvoidingView behavior='padding'>
           <TextInput placeholder='Email' value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
           <TextInput placeholder='Password' value={password} onChangeText={password => setPassword(password)} secureTextEntry style={styles.inputContainer} placeholderTextColor="#fff"/>
-          <TouchableOpacity style={styles.loginButton} >
+          <TouchableOpacity style={styles.loginButton} onPress={handleSignin}>
             <Text style={styles.loginText}>Sign in</Text>
             <View style={styles.loginImage}>
                 <Image source={require('../assets/images/white-right-arrow.png')} style={{width: 20, height: 20,resizeMode : 'contain' }}/>
@@ -24,8 +43,8 @@ const LoginScreen = () => {
           <View style={styles.fbAuthContainer}>
           </View>
           <View style={styles.links}>
-            <Text style={styles.registerLink}>Sign up</Text>
-            <Text style={styles.forgotLink}>Forgot Password?</Text>
+            <TouchableOpacity onPress={handleSignUpClick}><Text style={styles.registerLink}>Sign up</Text></TouchableOpacity>
+            <TouchableOpacity><Text style={styles.forgotLink}>Forgot Password?</Text></TouchableOpacity>
         </View>
         </View>
       )
