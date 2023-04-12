@@ -1,4 +1,4 @@
-import { Image,StatusBar, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
+import {ActivityIndicator, Image,StatusBar,Platform, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
@@ -8,10 +8,13 @@ const LoginScreen = () => {
     const navigation = useNavigation();
     const [email,setEmail] = useState('');
     const [password,setPassword] =  useState('')
+    const [isLoading,setisLoading] =  useState(false)
     const handleSignin= () => {
-            auth.signInWithEmailAndPassword(email,password).then(
-                
-            ).catch(error => {alert(error.message)})
+            setisLoading(true);
+            auth.signInWithEmailAndPassword(email,password).then(()=>{setisLoading(false);}
+            ).catch(error => {
+                setisLoading(false);
+                alert(error.message)})
         }
         useEffect(() =>{
            const unsubscribe = auth.onAuthStateChanged(user => {
@@ -29,14 +32,16 @@ const LoginScreen = () => {
          <StatusBar barStyle="light-content" /> 
           <View style={styles.selfAuthContainer}>
             <Text style={styles.title}>Welcome!</Text>
-          <KeyboardAvoidingView behavior='padding'>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <TextInput placeholder='Email' value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
           <TextInput placeholder='Password' value={password} onChangeText={password => setPassword(password)} secureTextEntry style={styles.inputContainer} placeholderTextColor="#fff"/>
-          <TouchableOpacity style={styles.loginButton} onPress={handleSignin}>
-            <Text style={styles.loginText}>Sign in</Text>
-            <View style={styles.loginImage}>
-                <Image source={require('../assets/images/white-right-arrow.png')} style={{width: 20, height: 20,resizeMode : 'contain' }}/>
+          <TouchableOpacity style={[styles.loginButton, isLoading ? styles.disabledLogin : '']} onPress={handleSignin}>
+          <View style={styles.loginImage}>
+            {(isLoading) ? <ActivityIndicator size="small" color="#ffffff" /> :
+            <Image source={require('../assets/images/white-right-arrow.png')} style={{width: 20, height: 20,resizeMode : 'contain' }}/>
+             }
             </View>
+            <Text style={styles.loginText}>Sign in</Text>
           </TouchableOpacity>
           </KeyboardAvoidingView>
           </View>
@@ -128,13 +133,17 @@ const LoginScreen = () => {
             alignItems:'center',
             padding:10,
             borderRadius:50,
+        }, disabledLogin:{
+            backgroundColor:'#B39DDB'
         }, loginText:{
             color:'white',
             fontSize:20,
             fontWeight:'600',
-            marginLeft:5
+            marginLeft:10,
+            marginRight:10
         }, loginImage: {
-            backgroundColor:'#6200EA',
-            marginLeft:10
+            marginLeft:5,
+            width:20,
+            height:20
         }
     })
