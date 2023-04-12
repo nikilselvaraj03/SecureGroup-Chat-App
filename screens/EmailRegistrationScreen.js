@@ -1,12 +1,28 @@
 import { KeyboardAvoidingView,StatusBar,Image, StyleSheet, Text, Touchable, TouchableOpacity, View, Platform} from 'react-native'
 import React from 'react'
+import { Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TextInput } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native';
-import {Dimensions} from 'react-native';
-const windowWidth = Dimensions.get('window').width;
+import { Easing } from 'react-native'
 export default function EmailRegistrationScreen() {
-    navigation = useNavigation()
+    navigation = useNavigation();
+    let rotateValueHolder = new Animated.Value(0);
+    const startImageRotateFunction = () => {
+        rotateValueHolder.setValue(0);
+        Animated.timing(rotateValueHolder, {
+          toValue: 1,
+          duration: 30000,
+          easing: Easing.linear,
+          useNativeDriver: false,
+        }).start(() => startImageRotateFunction());
+      };
+    
+      const RotateData = rotateValueHolder.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg'],
+      });
+      React.useEffect(() => {startImageRotateFunction()})
   return (
     <SafeAreaView style={styles.container}>
     <StatusBar barStyle="dark-content" /> 
@@ -28,7 +44,7 @@ export default function EmailRegistrationScreen() {
         </TouchableOpacity>
         
     </View>
-    <View style={styles.circle1}></View>
+    <Animated.View style={[styles.circle1,{transform: [{ rotate: RotateData }]}]}/>
     <View style={styles.circle2}></View>
     </SafeAreaView>
   )
