@@ -12,7 +12,7 @@ export default function EmailRegistrationScreen() {
         rotateValueHolder.setValue(0);
         Animated.timing(rotateValueHolder, {
           toValue: 1,
-          duration: 30000,
+          duration: 50000,
           easing: Easing.linear,
           useNativeDriver: false,
         }).start(() => startImageRotateFunction());
