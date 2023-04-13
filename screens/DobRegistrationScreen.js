@@ -4,7 +4,8 @@ import React from 'react'
 export default function DobRegistrationScreen() {
   return (
     <View>
-      <Text>DobRegistrationScreen</Text>
+      <Text>Enter your date of birth!</Text>
+      
     </View>
   )
 }

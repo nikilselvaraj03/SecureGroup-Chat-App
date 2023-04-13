@@ -32,7 +32,7 @@ export default function EmailRegistrationScreen() {
             <Text style={styles.inputTitle}>E-MAIL ADDRESS</Text>
             <TextInput style={styles.emailInput}></TextInput>
         </View>
-        <TouchableOpacity  style={styles.nxtBtn}>
+        <TouchableOpacity  style={styles.nxtBtn} onPress={()=>{navigation.navigate('NameRegistration')}}>
                 <Image source={require('../assets/images/purple-right-arrow.png')} style={{width: 20, height: 20,resizeMode : 'contain'}}/>
                 <Text style={styles.nextBtntTxt}>Next</Text>
         </TouchableOpacity>
@@ -45,7 +45,7 @@ export default function EmailRegistrationScreen() {
         
     </View>
     <Animated.View style={[styles.circle1,{transform: [{ rotate: RotateData }]}]}/>
-    <View style={styles.circle2}></View>
+    <View style={[styles.circle2]}></View>
     </SafeAreaView>
   )
 }
@@ -103,22 +103,22 @@ const styles = StyleSheet.create({
         color:'#673AB7',
         fontWeight:'bold'
     },circle1:{
-        height:300,
-        width:300,
+        height:250,
+        width:250,
         backgroundColor:'#E8EAF6',
         position:'absolute',
         top:-60,
-        left:-80,
+        right:-80,
         zIndex:-1,
         transform:[{rotate:'45deg'}]
     },
     circle2:{
-        height:300,
-        width:300,
+        height:250,
+        width:250,
         backgroundColor:'#E8EAF6',
         position:'absolute',
         bottom:-60,
-        right:-50,
+        left:-50,
         borderRadius:180,
         zIndex:-1
     }
