@@ -1,10 +1,38 @@
-import { KeyboardAvoidingView,Image,Platform, StyleSheet,StatusBar, Text, TouchableOpacity, View, Dimensions } from 'react-native'
-import React from 'react'
+import { KeyboardAvoidingView,Image,Platform, StyleSheet,StatusBar, Text, TouchableOpacity, View, Dimensions, Keyboard } from 'react-native'
+import React, { useState } from 'react'
 import { TextInput } from 'react-native-gesture-handler'
-import { useNavigation } from '@react-navigation/native';
 import BouncingBalls from 'react-native-bouncing-ball'
-export default function NameRegistrationScreen() {
-  let navigation = useNavigation()
+export default function NameRegistrationScreen({route,navigation}) {
+  const [first_name,setfirst_name] = useState('');
+  const [last_name,setlast_name] = useState('');
+  const [error, setError] = useState('');
+  const [isValid,setisValid] =  useState(false)
+  const {email} = route.params; 
+  const validate = (isSubmit) => {
+    error_des = ''
+    if (!first_name && !last_name) {
+      error_des='Please input FirstName and LastName';
+      setisValid(false);
+    }
+    else if (!first_name) {
+      error_des='Please input FirstName';
+      setisValid(false);
+    }
+     else if (!last_name) {
+      error_des='Please input LastName';
+      setisValid(false);
+    }
+    else {
+        setisValid(true);
+        if(isSubmit) {
+          navigation.navigate('DobRegistration',{email,first_name,last_name});
+        }
+    }
+    if(isSubmit) {Keyboard.dismiss();
+    setError(error_des)} else{
+      setError('')
+  }
+}
   return (
     <View style={styles.container}>
       <BouncingBalls
@@ -26,12 +54,15 @@ export default function NameRegistrationScreen() {
       </View>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.nameContainer}>
       <Text style={styles.inputTitle}>FIRST NAME</Text>
-      <TextInput style={styles.input}></TextInput>
+      <TextInput style={styles.input} onChangeText={(firstName)=>{setfirst_name(firstName);validate(false)}} maxLength={20} autoFocus={true}></TextInput>
       <Text style={styles.inputTitle}>LAST NAME</Text>
-      <TextInput style={styles.input}></TextInput>
-      <TouchableOpacity style={styles.nxtBtn} onPress={()=> {navigation.navigate('DobRegistration')}}>
+      <TextInput style={styles.input} onChangeText={(lastName)=>{setlast_name(lastName);validate(false)}} maxLength={20}></TextInput>
+      {error && (
+        <Text style={styles.error}> {error} </Text>
+      )}
+      <TouchableOpacity  style={[styles.nxtBtn,{opacity:isValid ? 1 : .6}]} onPress={()=> {validate(true);}}>
         <Image source={require('../assets/images/purple-right-arrow.png')} style={{width: 20, height: 20,resizeMode : 'contain'}}/>
-        <Text style={styles.nxtTxt}>Proceed</Text>
+        <Text style={styles.nxtTxt}>Next</Text>
       </TouchableOpacity>
       </KeyboardAvoidingView>
     </View>
@@ -88,5 +119,10 @@ const styles = StyleSheet.create({
   nxtTxt:{
     fontSize:17,
     color:'#673AB7'
+  }, error:{
+    color:'red',
+    marginVertical:15,
+    fontSize:16,
+    alignSelf:'flex-start'
   }
 })

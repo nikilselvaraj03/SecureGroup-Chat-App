@@ -1,12 +1,44 @@
-import { KeyboardAvoidingView,StatusBar,Image, StyleSheet, Text, Touchable, TouchableOpacity, View, Platform} from 'react-native'
-import React from 'react'
+import { KeyboardAvoidingView,StatusBar,Image, StyleSheet, Text, TouchableOpacity, View, Platform, Keyboard} from 'react-native'
+import React, { useState } from 'react'
 import { Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TextInput } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native';
 import { Easing } from 'react-native'
+import { doc, getDoc } from "firebase/firestore";
+import {db} from '../firebase'
 export default function EmailRegistrationScreen() {
     navigation = useNavigation();
+    const [email,setEmail] = useState('')
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [isValid,setisValid] =  useState(false)
+    const validate = async (isSubmit) => {
+        error_des=''
+        setLoading(true);
+        if (!email) {
+          error_des='Please input email address.';
+          setisValid(false);
+        } else if (!email.match(/\S+@\S+\.\S+/)) {
+            error_des='Please input a valid email address.';
+          setisValid(false);
+        }
+        // else if(isSubmit && (await getDoc(doc(db,'users',email))).exists()){
+        //     setError('Email address already exists.');
+        //     setisValid(false)
+        // }
+         else {
+            setisValid(true);
+            if(isSubmit) {
+                setLoading(false);
+                navigation.navigate('NameRegistration',{email})
+            }
+        }
+        if(isSubmit) {Keyboard.dismiss();
+            setError(error_des)} else{
+              setError('')
+          }
+    }
     let rotateValueHolder = new Animated.Value(0);
     const startImageRotateFunction = () => {
         rotateValueHolder.setValue(0);
@@ -30,9 +62,12 @@ export default function EmailRegistrationScreen() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.inputContainer}>
         <View>
             <Text style={styles.inputTitle}>E-MAIL ADDRESS</Text>
-            <TextInput style={styles.emailInput}></TextInput>
+            <TextInput value= {email} onChangeText={(email)=>{setEmail(email);validate(false);}} style={styles.emailInput}></TextInput>
+            {error && (
+        <Text style={styles.error}> {error} </Text>
+      )}
         </View>
-        <TouchableOpacity  style={styles.nxtBtn} onPress={()=>{navigation.navigate('NameRegistration')}}>
+        <TouchableOpacity style={[styles.nxtBtn,{opacity:isValid ? 1 : .6}]} onPress={()=>{validate(true)}}>
                 <Image source={require('../assets/images/purple-right-arrow.png')} style={{width: 20, height: 20,resizeMode : 'contain'}}/>
                 <Text style={styles.nextBtntTxt}>Next</Text>
         </TouchableOpacity>
@@ -120,7 +155,12 @@ const styles = StyleSheet.create({
         bottom:-60,
         left:-50,
         borderRadius:180,
-        zIndex:-1
-    }
+        zIndex:-1,
+    }, error:{
+        color:'red',
+        paddingTop:25,
+        fontSize:16,
+        alignSelf:'flex-start'
+      }
 
 })

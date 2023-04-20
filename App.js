@@ -6,6 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import RegistrationScreen from './screens/RegistrationScreen';
 import { auth } from './firebase';
 import Home from './screens/Home'
+import { useEffect } from 'react';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -17,6 +18,15 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
+
+//   useEffect(() =>{
+//     const unsubscribe = auth.onAuthStateChanged(user => {
+//          if(user) {
+//              navigation.navigate('Home')
+//          }
+//      })
+//      return unsubscribe
+//  })
   return (
     <NavigationContainer>
     <Stack.Navigator>

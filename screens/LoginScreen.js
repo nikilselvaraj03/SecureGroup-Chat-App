@@ -1,41 +1,67 @@
-import {ActivityIndicator, Image,StatusBar,Platform, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
+import {ActivityIndicator,Keyboard, Image,StatusBar,Platform, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 const LoginScreen = () => {
     const navigation = useNavigation();
     const [email,setEmail] = useState('');
     const [password,setPassword] =  useState('')
     const [isLoading,setisLoading] =  useState(false)
+    const [error, setError] = useState('');
+    const [isValid,setisValid] =  useState(false)
     const handleSignin= () => {
             setisLoading(true);
-            auth.signInWithEmailAndPassword(email,password).then(()=>{setisLoading(false);}
+           signInWithEmailAndPassword(auth,email,password).then(()=>{setisLoading(false);}
             ).catch(error => {
                 setisLoading(false);
-                alert(error.message)})
-        }
-        useEffect(() =>{
-           const unsubscribe = auth.onAuthStateChanged(user => {
-                if(user) {
-                    navigation.navigate('Home')
+                let error_msg = error.message.toString();
+                if(error_msg.includes('wrong-password') || error_msg.includes('user-not-found')) {
+                    error_msg = "Incorrect email address or password.";
                 }
-            })
-            return unsubscribe
-        })
+                setError(error_msg)})
+        }
         const handleSignUpClick = () => {
             navigation.navigate('SignUp')
         }
+    
+      function validate(isSubmit) {
+        error_des=''
+        setisValid(false);
+        if(!email && !password){
+          error_des='Please provide email and password to continue.';
+        }
+        else if (!email) {
+          error_des='Please input email address.';
+        } else if (!email.match(/\S+@\S+\.\S+/)) {
+          error_des='Please input a valid email address.';
+        } else if (!password) {
+            error_des='Please input the password to login.';
+        } else {
+            setisValid(true);
+            if(isSubmit){
+                handleSignin()
+            }
+        }
+        if(isSubmit) {Keyboard.dismiss();
+            setError(error_des)} else{
+              setError('')
+          }
+
+      }
     return (
         <View style={styles.loginContainer}>
          <StatusBar barStyle="light-content" /> 
           <View style={styles.selfAuthContainer}>
             <Text style={styles.title}>Welcome!</Text>
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <TextInput placeholder='Email' value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
+          <TextInput placeholder='Email' blurOnSubmit={true} onSubmitEditing={()=>validate(false)} value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
           <TextInput placeholder='Password' value={password} onChangeText={password => setPassword(password)} secureTextEntry style={styles.inputContainer} placeholderTextColor="#fff"/>
-          <TouchableOpacity style={[styles.loginButton, isLoading ? styles.disabledLogin : '']} onPress={handleSignin}>
+          { (
+            <Text style={error ? styles.error : styles.hidden_error}> {error} </Text>)}
+          <TouchableOpacity style={[styles.loginButton, isLoading ? styles.disabledLogin : '']} onPress={() => validate(true)}>
           <View style={styles.loginImage}>
             {(isLoading) ? <ActivityIndicator size="small" color="#ffffff" /> :
             <Image source={require('../assets/images/white-right-arrow.png')} style={{width: 20, height: 20,resizeMode : 'contain' }}/>
@@ -145,5 +171,11 @@ const LoginScreen = () => {
             marginLeft:5,
             width:20,
             height:20
-        }
+        }, error:{
+            color:'#F18F01',
+            padding:15,
+            fontSize:17,
+            textAlign:'center',
+            fontWeight:'500'
+          }
     })
