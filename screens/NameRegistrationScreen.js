@@ -1,5 +1,5 @@
 import { KeyboardAvoidingView,Image,Platform, StyleSheet,StatusBar, Text, TouchableOpacity, View, Dimensions, Keyboard } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TextInput } from 'react-native-gesture-handler'
 import BouncingBalls from 'react-native-bouncing-ball'
 export default function NameRegistrationScreen({route,navigation}) {
@@ -8,6 +8,7 @@ export default function NameRegistrationScreen({route,navigation}) {
   const [error, setError] = useState('');
   const [isValid,setisValid] =  useState(false)
   const {email} = route.params; 
+
   const validate = (isSubmit) => {
     error_des = ''
     if (!first_name && !last_name) {
@@ -25,7 +26,9 @@ export default function NameRegistrationScreen({route,navigation}) {
     else {
         setisValid(true);
         if(isSubmit) {
+          Keyboard.dismiss()
           navigation.navigate('DobRegistration',{email,first_name,last_name});
+          return;
         }
     }
     if(isSubmit) {Keyboard.dismiss();
@@ -33,6 +36,11 @@ export default function NameRegistrationScreen({route,navigation}) {
       setError('')
   }
 }
+
+useEffect(()=>{
+  validate(false);
+},[first_name,last_name])
+
   return (
     <View style={styles.container}>
       <BouncingBalls
@@ -54,9 +62,9 @@ export default function NameRegistrationScreen({route,navigation}) {
       </View>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.nameContainer}>
       <Text style={styles.inputTitle}>FIRST NAME</Text>
-      <TextInput style={styles.input} onChangeText={(firstName)=>{setfirst_name(firstName);validate(false)}} maxLength={20} autoFocus={true}></TextInput>
+      <TextInput style={styles.input} onChangeText={(firstName)=>{setfirst_name(firstName);}} maxLength={20} autoFocus={true}></TextInput>
       <Text style={styles.inputTitle}>LAST NAME</Text>
-      <TextInput style={styles.input} onChangeText={(lastName)=>{setlast_name(lastName);validate(false)}} maxLength={20}></TextInput>
+      <TextInput style={styles.input} onChangeText={(lastName)=>{setlast_name(lastName);}} maxLength={20}></TextInput>
       {error && (
         <Text style={styles.error}> {error} </Text>
       )}

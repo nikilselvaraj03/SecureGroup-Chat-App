@@ -4,9 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
 import LoginScreen from './screens/LoginScreen';
 import RegistrationScreen from './screens/RegistrationScreen';
-import { auth } from './firebase';
-import Home from './screens/Home'
-import { useEffect } from 'react';
+import { RootSiblingParent } from 'react-native-root-siblings';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -19,27 +17,19 @@ export default function App() {
     return null;
   }
 
-//   useEffect(() =>{
-//     const unsubscribe = auth.onAuthStateChanged(user => {
-//          if(user) {
-//              navigation.navigate('Home')
-//          }
-//      })
-//      return unsubscribe
-//  })
   return (
+    <RootSiblingParent>
     <NavigationContainer>
     <Stack.Navigator>
-      {auth.token ? (
-        <Stack.Screen name="Home" options={{headerShown:false}} component={Home} />
-      ) : (
+      {(
         <>
-          <Stack.Screen name="Login" options={{headerShown:false}} component={LoginScreen} />
+          <Stack.Screen name="Login" options={{headerShown:false}}  initialParams={{fromSignUp:false}}component={LoginScreen} />
           <Stack.Screen name="SignUp" options={{headerShown:false}} component={RegistrationScreen} />
         </>
       )}
     </Stack.Navigator>
   </NavigationContainer>
+  </RootSiblingParent>
   );
 }
 

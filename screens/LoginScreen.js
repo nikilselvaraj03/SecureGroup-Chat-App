@@ -1,20 +1,46 @@
-import {ActivityIndicator,Keyboard, Image,StatusBar,Platform, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react';
+import {ActivityIndicator,TouchableWithoutFeedback, Keyboard, Image,StatusBar,Platform, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
+import React, { useEffect, useMemo, useState } from 'react';
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-const LoginScreen = () => {
+import Home from './Home';
+const LoginScreen = ({ route, navigationParam }) => {
+
     const navigation = useNavigation();
     const [email,setEmail] = useState('');
     const [password,setPassword] =  useState('')
     const [isLoading,setisLoading] =  useState(false)
     const [error, setError] = useState('');
-    const [isValid,setisValid] =  useState(false)
+    const [isValid,setisValid] =  useState(false);
+    const [loggedIn,setLoggedIn] = useState(false);
+    useEffect(() => {
+        // Add a touch event listener to the root view
+        const hideKeyboardOnPress = Keyboard.addListener('keyboardDidHide', () => {
+          Keyboard.dismiss();
+        });
+        const {fromSignUp} = route.params;
+
+        if(fromSignUp) {
+            auth.currentUser = null;
+            auth.signOut()
+        }
+
+        // Clean up the event listener on unmount
+        return () => {
+          hideKeyboardOnPress.remove();
+        };
+      }, [route.params]);
+
     const handleSignin= () => {
             setisLoading(true);
-           signInWithEmailAndPassword(auth,email,password).then(()=>{setisLoading(false);}
+            signInWithEmailAndPassword(auth,email,password).then((userCred)=>{
+            setisLoading(false);
+            if(userCred && userCred.user && userCred.user.uid) {
+                setLoggedIn(true);
+            }
+        }
             ).catch(error => {
                 setisLoading(false);
                 let error_msg = error.message.toString();
@@ -51,13 +77,15 @@ const LoginScreen = () => {
           }
 
       }
-    return (
+    return (loggedIn && auth.currentUser && auth.currentUser.uid ?
+     <Home userToken={auth.currentUser} /> :
+      (<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.loginContainer}>
          <StatusBar barStyle="light-content" /> 
           <View style={styles.selfAuthContainer}>
             <Text style={styles.title}>Welcome!</Text>
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <TextInput placeholder='Email' blurOnSubmit={true} onSubmitEditing={()=>validate(false)} value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
+          <TextInput placeholder='Email'  autoCapitalize="none" blurOnSubmit={true} onSubmitEditing={()=>validate(false)} value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
           <TextInput placeholder='Password' value={password} onChangeText={password => setPassword(password)} secureTextEntry style={styles.inputContainer} placeholderTextColor="#fff"/>
           { (
             <Text style={error ? styles.error : styles.hidden_error}> {error} </Text>)}
@@ -77,7 +105,7 @@ const LoginScreen = () => {
             <TouchableOpacity onPress={handleSignUpClick}><Text style={styles.registerLink}>Sign up</Text></TouchableOpacity>
             <TouchableOpacity><Text style={styles.forgotLink}>Forgot Password?</Text></TouchableOpacity>
         </View>
-        </View>
+        </View></TouchableWithoutFeedback>)
       )
     }
     
