@@ -8,7 +8,15 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 
 const ProfilePage = ({userinfo}) => {
-  console.log(userinfo.first_name);
+
+
+  let dateformat = userinfo.date_of_birth; // Assuming userinfo.date_of_birth is '1997-04-25T05:00:00.000Z'
+
+  const yyyy = dateformat.substring(0, 4);
+  const mm = dateformat.substring(5, 7);
+  const dd = dateformat.substring(8, 10);
+  const formattedDob = `${yyyy}-${mm}-${dd}`;
+
   const navigation = useNavigation();
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState(userinfo.first_name);
@@ -17,17 +25,13 @@ const ProfilePage = ({userinfo}) => {
   const [editedLastName, setEditedLastName] = useState(''); 
   const [dob, setDob] = useState(userinfo.date_of_birth);
   const [editeddob, setEditeddob] = useState(''); 
-  // const [name, setName] = useState('Pooja');
-  // const [bio, setBio] = useState('Master student');
-  // const [location, setLocation] = useState('Kolkata, India');
-  // const [phone, setPhone] = useState('1234567890');
-  // const [email, setEmail] = useState('pooja@example.com');
+
 
   const handleEditPress = () => {
     setIsEditing(true); // Enable editing mode
     setEditedFirstName(firstName);
     setEditedLastName(LastName);
-    setEditeddob(dob);
+    setEditeddob(formattedDob);
 
   };
   const handleSavePress = () => {
@@ -54,12 +58,12 @@ const ProfilePage = ({userinfo}) => {
         <View style={styles.userInfoSection}>
           <View style={{flexDirection: 'column', marginTop: 30, justifyContent: 'center', alignItems: 'center'}}>
             <Avatar.Image
-              source={require('../assets/images/minions.jpeg')} size={120}
+              source={userinfo && userinfo.profile_photo_url ? {uri:userinfo.profile_photo_url}: require('../assets/images/minions.jpeg')} size={120}
              />
              <View style={{marginLeft: 10}}>
               <Title style={[styles.title, {
                 marginTop:15, marginBottom:5, color:'white'
-              }]}>Pooja Srinivasan</Title>
+              }]}>{userinfo.first_name} {userinfo.last_name}</Title>
              </View>
           </View>
         </View>
@@ -68,17 +72,19 @@ const ProfilePage = ({userinfo}) => {
       <FontAwesome name="user"  size={25} color='#673AB7' />
       {
         isEditing ? (
+          <View style={{flexDirection: 'row'}}>
+         <Text style={styles.label}>First Name:</Text>
           <TextInput            
           placeholder="First Name"
           placeholderTextColor="#666666"
           value={editedFirstName}
           onChangeText={handleInputChange}
           autoCorrect={true}
-          // onChangeText={text => setFirstName(text)}
           style={[
             styles.menuItemText
           ]}
         />
+        </View>
         ) :(
           <Text style={[
             styles.menuItemText
@@ -93,6 +99,8 @@ const ProfilePage = ({userinfo}) => {
           <FontAwesome name="user-o"  size={25} color='#673AB7' />
           {
             isEditing ? (
+              <View style={{flexDirection: 'row'}}>
+              <Text style={styles.label}>Last Name:</Text>
               <TextInput
               placeholder="Last Name"
               placeholderTextColor="#666666"
@@ -103,6 +111,7 @@ const ProfilePage = ({userinfo}) => {
                 styles.menuItemText
               ]}
             />
+            </View>
             ) :(
               <Text style={[
                 styles.menuItemText
@@ -123,21 +132,23 @@ const ProfilePage = ({userinfo}) => {
           <FontAwesome name="calendar"  size={25} color='#673AB7' />
           {
             isEditing ? (
+              <View style={{flexDirection: 'row'}}>
+              <Text style={styles.label}>YYYY-MM-DD:</Text>
               <TextInput
               placeholder="Date-Of-Birth"
               placeholderTextColor="#666666"
               value={editeddob}
               onChangeText={handleInputChangedob}
-              keyboardType='numeric'
               autoCorrect={false}
               style={[
                 styles.menuItemText
               ]}
             />
+            </View>
             ) : (
               <Text style={[
                 styles.menuItemText
-              ]}>09-19-1999</Text>
+              ]}>{formattedDob}</Text>
             )
           }
     
@@ -160,7 +171,7 @@ const ProfilePage = ({userinfo}) => {
   )
 }
 
-export default ProfilePage;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -175,6 +186,11 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     paddingBottom:10,
 
+  },
+  label: {
+    fontSize: 15,
+    marginLeft: 15,
+    marginTop: 3,
   },
   title: {
     fontSize: 25,
@@ -268,3 +284,4 @@ const styles = StyleSheet.create({
   },
 });
 
+export default ProfilePage;

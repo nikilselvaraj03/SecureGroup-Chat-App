@@ -22,7 +22,7 @@ export default function App() {
     <Stack.Navigator>
       {(
         <>
-          <Stack.Screen name="Login" options={{headerShown:false}}  initialParams={{fromSignUp:false}}component={LoginScreen} />
+          <Stack.Screen name="Login" options={{headerShown:false}}  initialParams={{fromSignUp:false}} component={LoginScreen} />
           <Stack.Screen name="SignUp" options={{headerShown:false}} component={RegistrationScreen} />
         </>
       )}

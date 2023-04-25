@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-root-toast';
@@ -21,38 +21,39 @@ import {firebase} from '../config';
 
 const width = Dimensions.get('window').width / 2 - 30;
 
-const LandingScreen = ({navigation}) => {
+const LandingScreen = ({ navigation, userinfo }) => {
+  // console.log(userinfo);
 
 const [groups, setGroups] = useState([]);
-const todoRef = firebase.firestore().collection('Groups');
+const todoRef = collection(db,'Groups');
 
 const [likedGroups, setLikedGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [filteredGroups, setFilteredGroups] = useState(groups);
-  
+    
+  useEffect(() => {
+      async function fetchData() {
+        if (userinfo && userinfo.groups) {
+          let q = query(todoRef, where('Groupid', 'in', userinfo.groups));
+          let rtrgroups = [];
+          const querySnapshot = await getDocs(q);
+          querySnapshot.forEach((doc) => {
+            rtrgroups.push(doc.data());
+            console.log(doc.id, " => ", doc.data());
+          });
+          setGroups(rtrgroups);
+          console.log(groups['Groupid']);
+        }
+      };
+    
+      fetchData();
+    }, [userinfo]);
 
-
-  useEffect(async () => {
-    todoRef
-    .onSnapshot(
-      QuerySnapshot => {
-        const groups = [];
-        QuerySnapshot.forEach((doc) => {
-          const { Name, Groupid } = doc.data();
-          groups.push({
-            id: doc.id,
-            Name,
-            Groupid,
-          })
-        })
-        setGroups(groups);
-      }
-    )
-  },[])
-
+    
   const handleSearch = (query) => {
     if(!query || query == ''){
-      setSearchQuery(false)
+      setSearchQuery('')
       return;
     } else{
       setSearchQuery(query);
@@ -62,9 +63,13 @@ const [likedGroups, setLikedGroups] = useState([]);
       setFilteredGroups(filteredGroups);
     }
   };
+
+  const togglePopup = () => {
+    setIsPopupVisible(!isPopupVisible);
+  };
   
   const handleLike = (group) => {
-    const likedGroupIndex = likedGroups.findIndex((likedGroup) => likedGroup.id === group.id);
+    const likedGroupIndex = likedGroups.findIndex((likedGroup) => likedGroup.id === group);
 
     if (likedGroupIndex !== -1) {
       const updatedLikedGroups = [...likedGroups];
@@ -77,18 +82,15 @@ const [likedGroups, setLikedGroups] = useState([]);
 
 
 
-  const Card = ({groups}) => {
-    const isLiked = likedGroups.findIndex((likedGroup) => likedGroup.id === groups.id) !== -1;
-
+  const Card = ({groups, groupid, userinfo}) => {
+    const isLiked = likedGroups.findIndex((likedGroup) => likedGroup.id === groupid) !== -1;
     return (
-      <TouchableOpacity style={{ padding:10}}
-        activeOpacity={0.8}
-        onPress={() => navigation.navigate('Details', plant)}>
+      <TouchableOpacity style={{ padding:10}} activeOpacity={0.8}>
         <StatusBar barStyle="dark-content" />
         <View style={style.card}>
           <View style={{alignItems: 'flex-end'}}>
-           <TouchableOpacity onPress={() => handleLike(groups)}>
-            <Icon name="favorite" size={20} color={isLiked ? 'red' : 'black'} />
+           <TouchableOpacity onPress={() => handleLike(groupid)}>
+            <Icon name="favorite" size={20} color={isLiked ? 'red' : '#b2b2b2'} />
           </TouchableOpacity>
             </View>
 
@@ -97,10 +99,10 @@ const [likedGroups, setLikedGroups] = useState([]);
               height:118,
               alignItems: 'center',
             }}>
-            {/* <Image
-              source={plant.img}
+            <Image
+              source={require('../assets/images/group-chat.webp')}
               style={{flex: 1, resizeMode: 'contain'}}
-            /> */}
+            />
           </View>
 
           <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 10, textAlign: 'center'}}>
@@ -111,11 +113,14 @@ const [likedGroups, setLikedGroups] = useState([]);
               flexDirection: 'row',
               justifyContent: 'space-between',
               marginTop: 5,
-            }}>        
-          <Icon name="message" size={25} color='#673AB7'/>
-          <Icon name="people" size={25} color='#673AB7' />
-          <Icon name="flag" size={25} color='#673AB7' />
-          <Icon name="settings" size={25} color='#673AB7' />
+            }}> 
+            
+          <TouchableOpacity onPress={togglePopup}>      
+          <Icon name="message" size={25} color= '#b2b2b2'/>
+          </TouchableOpacity> 
+          <TouchableOpacity>
+          <Icon name="people" size={25} color='#b2b2b2' />
+          </TouchableOpacity>
         </View>
         </View>
       </TouchableOpacity>
@@ -127,15 +132,15 @@ const [likedGroups, setLikedGroups] = useState([]);
       style={{flex: 1, paddingHorizontal: 20, backgroundColor: COLORS.white}}>
       <View style={style.header}>
         <View>
-          <Text style={{fontSize:30, color: '#673AB7', justifyContent:'center', fontWeight: 'bold', paddingLeft: 10}}>
+          <Text style={{fontSize:25, color: '#673AB7', justifyContent:'center', fontWeight: 'bold', paddingLeft: 10}}>
             TOPDECK
           </Text>
         </View>
       </View>
-      <View style={{marginTop: 30, flexDirection: 'row'}}>
+      <View style={{marginTop: 30, flexDirection: 'row',paddingHorizontal:20}}>
         <View style={style.searchContainer}>
           <Icon name="search" size={25} style={{marginLeft: 20}} />
-          <TextInput placeholder="Search" style={style.input} value={groups} onChangeText={(text)=>{handleSearch(text)}}/>
+          <TextInput placeholder="Search" style={style.input} value={searchQuery}  onChangeText={(text)=>{handleSearch(text)}}/>
         </View>
         <View style={style.sortBtn}>
           <Icon name="sort" size={30} color='white'/>
@@ -151,7 +156,7 @@ const [likedGroups, setLikedGroups] = useState([]);
         numColumns={2}
         data={searchQuery ? filteredGroups : groups}
         renderItem={({item}) => {
-          return <Card groups={item.Name} />;
+          return <Card groups={item.Name} groupid={item.Groupid} userinfo={userinfo.groups} />;
         }}
 
       />
@@ -184,6 +189,7 @@ const style = StyleSheet.create({
   },
   header: {
     marginTop: 30,
+    paddingHorizontal:20,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
