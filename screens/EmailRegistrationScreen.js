@@ -6,7 +6,9 @@ import { TextInput } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native';
 import { Easing } from 'react-native'
 import { auth, db } from '../firebase'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
+
 export default function EmailRegistrationScreen() {
     navigation = useNavigation();
     const [email, setEmail] = useState('')
