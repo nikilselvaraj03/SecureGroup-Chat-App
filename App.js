@@ -29,7 +29,6 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
-
   return (
     <RootSiblingParent>
     <NavigationContainer>
@@ -42,6 +41,7 @@ export default function App() {
         </>
       )}
     </Stack.Navigator>
+ 
   </NavigationContainer>
   </RootSiblingParent>
   );
