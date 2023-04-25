@@ -103,7 +103,7 @@ const LoginScreen = ({ route, navigationParam }) => {
           </View>
           <View style={styles.links}>
             <TouchableOpacity onPress={handleSignUpClick}><Text style={styles.registerLink}>Sign up</Text></TouchableOpacity>
-            <TouchableOpacity><Text style={styles.forgotLink}>Forgot Password?</Text></TouchableOpacity>
+            <TouchableOpacity onPress={()=>{navigation.navigate('PasswordReset')}}><Text style={styles.forgotLink}>Forgot Password?</Text></TouchableOpacity>
         </View>
         </View></TouchableWithoutFeedback>)
       )
@@ -141,7 +141,6 @@ const LoginScreen = ({ route, navigationParam }) => {
         title:{
             color:'white',
             fontSize:45,
-            fontWeight:'bold',
             paddingBottom:60,
             marginLeft:10,
             fontFamily:'Caveat',

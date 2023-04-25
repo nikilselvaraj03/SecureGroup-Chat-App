@@ -5,6 +5,7 @@ import EmailRegistrationScreen from './EmailRegistrationScreen'
 import NameRegistrationScreen from './NameRegistrationScreen'
 import DobRegistrationScreen from './DobRegistrationScreen'
 import PasswordRegistrationScreen from './PasswordRegistrationScreen'
+import ProfilePhoto from './ProfilePhoto';
 const Stack = createNativeStackNavigator();
 export default function RegistrationScreen() {
   return (
@@ -12,6 +13,7 @@ export default function RegistrationScreen() {
         <Stack.Screen options={{headerShown:false}} name="EmailRegistration" component={EmailRegistrationScreen}/>
         <Stack.Screen options={{headerShown:false}} name="NameRegistration"component={NameRegistrationScreen}/>
         <Stack.Screen options={{headerShown:false}} name="DobRegistration" component={DobRegistrationScreen}/>
+        <Stack.Screen options={{headerShown:false}} name="ProfilePhoto" component={ProfilePhoto}/>
         <Stack.Screen options={{headerShown:false}} name="PasswordRegistration" component={PasswordRegistrationScreen}/>
       </Stack.Navigator>
   )

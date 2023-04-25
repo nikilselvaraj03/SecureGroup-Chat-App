@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import Toast from 'react-native-root-toast';
 export default function PasswordRegistrationScreen({ route, navigation }) {
 
-  const { email, first_name, last_name, date_of_birth } = route.params
+  const { email, first_name, last_name, date_of_birth, profilePhotoURL } = route.params
   const [password, setPassword] = useState('');
   const [reenterPassword, setrenterPassword] = useState('');
   const [error, setError] = useState('');
@@ -54,7 +54,8 @@ export default function PasswordRegistrationScreen({ route, navigation }) {
           first_name: first_name,
           last_name: last_name,
           date_of_birth: date_of_birth,
-          userId: userCred.user.uid
+          userId: userCred.user.uid,
+          profile_photo_url : profilePhotoURL
         }).then(() => {
           console.log("Document written with ID: ", userCred.user.uid);
           Toast.show('Signup for TopDeck Successful.', {
