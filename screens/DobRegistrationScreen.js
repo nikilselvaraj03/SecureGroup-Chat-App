@@ -26,7 +26,7 @@ export default function DobRegistrationScreen({route,navigation}) {
     } else {
       setisValid(true);
       if(isSubmit) {
-        navigation.navigate('PasswordRegistration',{email,first_name,last_name,date_of_birth})
+        navigation.navigate('ProfilePhoto',{email,first_name,last_name,date_of_birth})
         return
       }
     }

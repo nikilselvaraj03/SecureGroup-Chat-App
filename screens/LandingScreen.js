@@ -16,7 +16,6 @@ import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-root-toast';
 import COLORS from '../consts/colors';
-import {firebase} from '../config';
 
 
 const width = Dimensions.get('window').width / 2 - 30;
