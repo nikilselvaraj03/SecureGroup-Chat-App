@@ -4,7 +4,7 @@ import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-root-toast';
-
+import NewGroupScreen from './NewGroupScreen';
 import Contacts from './Contacts';
 import CreateGroup from './CreateGroup';
 import LandingScreen from './LandingScreen';
@@ -18,7 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const home = 'Home';
 const profilePage = 'ProfilePage';
 const contacts = 'Requests';
-const creategroup = 'CreateGroup';
+const creategroup = 'NewGroupScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -87,7 +87,7 @@ export default function Home({userToken}) {
             >
                 <Tab.Screen name={home} options={{headerShown:false}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
-                <Tab.Screen name={creategroup} options={{headerShown:false}} component={CreateGroup}/>
+                <Tab.Screen name={creategroup} options={{headerShown:false}} component={NewGroupScreen}/>
                 <Tab.Screen name={contacts} options={{headerShown:false}}>{() => <Contacts userinfo={userinfo} />}</Tab.Screen>
                 <Tab.Screen name={profilePage} options={{headerShown:false}}>{() => <ProfilePage userinfo={userinfo} />}</Tab.Screen>                
           </Tab.Navigator>
