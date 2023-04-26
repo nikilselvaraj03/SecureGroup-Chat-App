@@ -21,7 +21,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.nikilselvaraj07.Topdeck"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,6 +37,11 @@
           "photosPermission": "The app accesses your photos to select profile picture, and share photos with your friends when you send."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a299a2ee-5b82-4556-ab44-fc1e0c0d96f8"
+      }
+    }
   }
 }
