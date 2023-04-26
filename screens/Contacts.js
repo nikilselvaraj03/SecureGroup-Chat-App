@@ -8,12 +8,13 @@ import {
   Image,
   Dimensions,
   StatusBar,
+  Alert,
 } from 'react-native';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
+import { collection, doc, getDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import COLORS from '../consts/colors';
@@ -53,7 +54,37 @@ const Contacts = ({ userinfo }) => {
         }
         }
       };
-        const Card = ({groups}) => {
+
+
+
+      
+        const Card = ({groups, groupid}) => {
+
+          const handleReject = async (groupid) => {
+            try {
+              // Delete the record from Firebase Firestore
+              await deleteDoc(doc(db, 'Groups', groupid));
+              console.log('Group deleted successfully:', groupid);
+          
+              // Update the state to reflect the changes
+              // setGroups(groupid.filter(item => item !== groupid));
+          
+              // Show a success message to the user
+              Alert.alert('Success', 'Group request rejected successfully');
+          
+            } catch (error) {
+              console.error('Error deleting group:', error);
+              // Show an error message to the user
+              Alert.alert('Error', 'Failed to reject group request');
+            }
+          };
+          const handleApprove = async (group) => {
+              Alert('The Request has been approved');
+              if(group){
+                <Text style={{color:'green'}}>Approve</Text>
+              }
+
+          }
 
           return (
             <TouchableOpacity style={{ paddingVertical:20}} activeOpacity={0.8}>
@@ -75,10 +106,10 @@ const Contacts = ({ userinfo }) => {
                 </View>    
 
                 <View style={style.buttoncontainer}>
-                <TouchableOpacity style={style.approvebuttonContainer} onPress={(group) => {approverequest(group)}}>
+                <TouchableOpacity style={style.approvebuttonContainer} onPress={(group) => handleApprove(group)}>
                     <Text style={style.approvebuttonText}>Approve</Text>
              </TouchableOpacity>
-             <TouchableOpacity style={style.rejectbuttonContainer} onPress={(group) => {approverequest(group)}}>
+             <TouchableOpacity style={style.rejectbuttonContainer} onPress={(group) => handleReject(group)}>
                     <Text style={style.rejectbuttonText}>Reject</Text>
              </TouchableOpacity>
              </View>

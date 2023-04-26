@@ -3,13 +3,13 @@ import { useNavigation } from '@react-navigation/native';
 import { View, Text, SafeAreaView, StyleSheet,TouchableOpacity, TextInput, } from 'react-native';
 import {Avatar, Title, Caption,TouchableRipple} from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 
 
 
 
 const ProfilePage = ({userinfo}) => {
-
-
   let dateformat = userinfo.date_of_birth; // Assuming userinfo.date_of_birth is '1997-04-25T05:00:00.000Z'
 
   const yyyy = dateformat.substring(0, 4);
@@ -41,6 +41,15 @@ const ProfilePage = ({userinfo}) => {
     setDob(editeddob);
   };
 
+  const handleCanclePress = () => {
+    setIsEditing(false);
+    setFirstName(firstName); // Disable editing mode
+    setLastName(LastName);
+    setDob(dob);
+  };
+  
+
+
   const handleInputChange = (value) => {
     setEditedFirstName(value);
 
@@ -54,16 +63,18 @@ const ProfilePage = ({userinfo}) => {
 
   return(
     <SafeAreaView style={styles.container}>
-
         <View style={styles.userInfoSection}>
-          <View style={{flexDirection: 'column', marginTop: 30, justifyContent: 'center', alignItems: 'center'}}>
-            <Avatar.Image
-              source={userinfo && userinfo.profile_photo_url ? {uri:userinfo.profile_photo_url}: require('../assets/images/minions.jpeg')} size={120}
-             />
-             <View style={{marginLeft: 10}}>
+          <View style={{flexDirection: 'row', marginTop: 30, justifyContent: 'left', alignItems: 'left'}}>
+            <Avatar.Image style={{backgroundColor:'#eaeaea'}}
+              source={userinfo && userinfo.profile_photo_url ? {uri:userinfo.profile_photo_url} : require('../assets/images/output.png')} size={120}/>
+             <View style={{marginLeft: 20}}>
               <Title style={[styles.title, {
-                marginTop:15, marginBottom:5, color:'white'
+                marginTop:35, marginBottom:5
               }]}>{userinfo.first_name} {userinfo.last_name}</Title>
+              <TouchableOpacity style={{flexDirection: 'row'}} onPress={isEditing ? handleSavePress : handleEditPress}>
+                  <FontAwesome name="edit"  size={25} color='#673AB7' paddingRight={8}/>
+                  <Text>{isEditing ? 'Edit Profile' : 'Edit Profile'}</Text>
+              </TouchableOpacity>
              </View>
           </View>
         </View>
@@ -162,11 +173,20 @@ const ProfilePage = ({userinfo}) => {
         </View>
         </View>
         <View>
-        <TouchableOpacity style={styles.buttonContainer} onPress={isEditing ? handleSavePress : handleEditPress}>
-        <Text style={styles.buttonText}>{isEditing ? 'Save' : 'Edit'}</Text>
-      </TouchableOpacity>
+      {isEditing ? (
+        <View style={{ flexDirection: 'row'}}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={handleSavePress} >
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonContainer} onPress={handleCanclePress}>
+            <Text style={styles.buttonText}>Cancle</Text>
+          </TouchableOpacity>
         </View>
-
+      ) : (
+       <View>
+       </View>
+      )}
+    </View>
     </SafeAreaView>
   )
 }
@@ -175,16 +195,19 @@ const ProfilePage = ({userinfo}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor:'white'
   },
   menuContainer: {
     margin:25
   },
   userInfoSection: {
-    backgroundColor: '#d5c8ed',
+    // backgroundColor: '#dbd8e3',
     paddingHorizontal: 30,
     marginBottom: 25,
-    paddingBottom:10,
+    paddingBottom:20,
+    borderBottomColor: '#dddddd',
+    borderBottomWidth: 1,
 
   },
   label: {
@@ -193,15 +216,17 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   title: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: 'bold',
+    color:'#757a79',
+
   },
   buttonContainer: {
     borderRadius: 25, // Customize the border radius as per your preference
     backgroundColor: '#673AB7',
     width: 100,
     marginTop: 30, // Customize the background color
-    marginLeft: '35%',
+    marginLeft: 60,
     paddingVertical: 10, // Customize the padding
     paddingHorizontal: 12, // Customize the padding
   },
@@ -219,13 +244,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 10,
   },
-  registerLink:{
-    color:'#673AB7',
-    textDecorationLine:'underline',
-    fontWeight:'bold',
-    marginTop:10,
-    fontSize:18
-},
   infoBoxWrapper: {
     borderBottomColor: '#dddddd',
     borderBottomWidth: 1,
@@ -233,13 +251,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     flexDirection: 'row',
     height: 100,
-  },
-  forgotLink:{
-    color:'#673AB7',
-    textDecorationLine:'underline',
-    fontWeight:'bold',
-    marginTop:10,
-    fontSize:18
   },
   infoBox: {
     width: '50%',
