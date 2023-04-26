@@ -8,21 +8,20 @@ import {
   Image,
   Dimensions,
   StatusBar,
+  Modal,
 } from 'react-native';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
-import Toast from 'react-native-root-toast';
 import COLORS from '../consts/colors';
-
 
 const width = Dimensions.get('window').width / 2 - 30;
 
 const LandingScreen = ({ navigation, userinfo }) => {
   // console.log(userinfo);
-
+navigation = useNavigation()
 const [groups, setGroups] = useState([]);
 const todoRef = collection(db,'Groups');
 
@@ -32,22 +31,24 @@ const [likedGroups, setLikedGroups] = useState([]);
   const [filteredGroups, setFilteredGroups] = useState(groups);
     
   useEffect(() => {
-      async function fetchData() {
-        if (userinfo && userinfo.groups) {
-          let q = query(todoRef, where('Groupid', 'in', userinfo.groups));
+    const fetchData = async () => {
+      if (userinfo && userinfo.groups) {
+        const docRef = doc(db, 'users', userinfo.userId);
+        const groups = await (await getDoc(docRef)).data().groups;
+        console.log(groups);
+        if (groups) {
+          let q = query(todoRef, where('Groupid', 'in', groups));
           let rtrgroups = [];
           const querySnapshot = await getDocs(q);
           querySnapshot.forEach((doc) => {
             rtrgroups.push(doc.data());
-            console.log(doc.id, " => ", doc.data());
           });
           setGroups(rtrgroups);
-          console.log(groups['Groupid']);
         }
-      };
-    
-      fetchData();
-    }, [userinfo]);
+      }
+    };
+    fetchData();
+  }, [userinfo]);
 
     
   const handleSearch = (query) => {
@@ -66,20 +67,19 @@ const [likedGroups, setLikedGroups] = useState([]);
   const togglePopup = () => {
     setIsPopupVisible(!isPopupVisible);
   };
+
+
+  function generateRandomNumber() {
+    // Generate a random decimal number between 0 (inclusive) and 1 (exclusive)
+    var randomDecimal = Math.random();
   
-  const handleLike = (group) => {
-    const likedGroupIndex = likedGroups.findIndex((likedGroup) => likedGroup.id === group);
+    // Scale the random decimal to a number between 1 and 20
+    var randomNumber = Math.floor(randomDecimal * 20) + 1;
+  
+    return randomNumber;
+  }
 
-    if (likedGroupIndex !== -1) {
-      const updatedLikedGroups = [...likedGroups];
-      updatedLikedGroups.splice(likedGroupIndex, 1);
-      setLikedGroups(updatedLikedGroups);
-    } else {
-      setLikedGroups([...likedGroups, group]);
-    }
-  };
-
-
+  let random = generateRandomNumber();
 
   const Card = ({groups, groupid, userinfo}) => {
     const isLiked = likedGroups.findIndex((likedGroup) => likedGroup.id === groupid) !== -1;
@@ -88,8 +88,8 @@ const [likedGroups, setLikedGroups] = useState([]);
         <StatusBar barStyle="dark-content" />
         <View style={style.card}>
           <View style={{alignItems: 'flex-end'}}>
-           <TouchableOpacity onPress={() => handleLike(groupid)}>
-            <Icon name="favorite" size={20} color={isLiked ? 'red' : '#b2b2b2'} />
+           <TouchableOpacity onPress={() => {}}>
+            <Icon name="favorite" size={20}  color={isLiked ?  'red' : 'black'}/>
           </TouchableOpacity>
             </View>
 
@@ -99,12 +99,12 @@ const [likedGroups, setLikedGroups] = useState([]);
               alignItems: 'center',
             }}>
             <Image
-              source={require('../assets/images/group-chat.webp')}
+              source={require('../assets/images/output.png')}
               style={{flex: 1, resizeMode: 'contain'}}
             />
           </View>
 
-          <Text style={{fontWeight: 'bold', fontSize: 17, marginTop: 10, textAlign: 'center'}}>
+          <Text ellipsizeMode='tail' numberOfLines={1} style={{fontWeight: 'bold', fontSize: 17, marginTop: 10, textAlign: 'center'}}>
             {groups}
           </Text>
           <View
@@ -113,10 +113,38 @@ const [likedGroups, setLikedGroups] = useState([]);
               justifyContent: 'space-between',
               marginTop: 5,
             }}> 
-            
+        <View>
           <TouchableOpacity onPress={togglePopup}>      
           <Icon name="message" size={25} color= '#b2b2b2'/>
           </TouchableOpacity> 
+          <Modal
+              visible={isPopupVisible}
+              animationType="slide"
+              transparent={true}
+              onRequestClose={togglePopup}
+    >
+      {/* Render the custom popup screen */}
+      <View style={style.popupContainer}>
+        <View>
+          <Text style={style.title}>Messages</Text>
+        </View>
+        {/* Customize the content of the popup screen */}
+        <View style={{flexDirection: 'row'}}>
+        <Text style={style.popupText}>Group Name:</Text>
+        <Text style={style.popupText}>{groups}</Text>
+        </View> 
+
+        <View style={{flexDirection: 'row'}}>
+        <Text style={style.popupText}>Unread Messages:</Text>
+        <Text style={style.popupText}>{random} messages</Text>
+        </View>
+
+        <TouchableOpacity onPress={togglePopup}>
+          <Text style={style.popupCloseButton}>Close</Text>
+        </TouchableOpacity>
+      </View>
+    </Modal>
+        </View>
           <TouchableOpacity>
           <Icon name="people" size={25} color='#b2b2b2' />
           </TouchableOpacity>
@@ -177,6 +205,14 @@ const style = StyleSheet.create({
     borderBottomWidth: 2,
     borderColor: '#673AB7',
   },
+  title:{
+    fontSize:30,
+    fontFamily:'Caveat-Bold',
+    minWidth:250,
+    color:'#673AB7',
+    marginLeft: 120,
+    paddingBottom: 20,
+  },
   card: {
     height: 225,
     backgroundColor: COLORS.light,
@@ -216,5 +252,30 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  popupContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  popupContentContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  popupText: {
+    fontSize: 18,
+    color: '#000',
+    marginBottom: 20,
+    padding:6,
+  },
+  popupCloseButton: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
+  },
 });
 export default LandingScreen;
+
