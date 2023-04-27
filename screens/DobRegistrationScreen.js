@@ -60,10 +60,10 @@ function formatDate(date) {
       <Text style={styles.title}>Enter your date of birth!</Text></View>
       <KeyboardAvoidingView style={styles.inputContainer} behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
       <View style={styles.datePickerStyle}>
-      <View style={styles.dateContainer} onPress={()=>{setShowDatePicker(!showDatePicker)}}>
+      <TouchableOpacity style={styles.dateContainer} onPress={()=>{setShowDatePicker(!showDatePicker)}}>
       <Text style={styles.dateFormat} >{formatDate(new Date(date_of_birth))}
       </Text >
-      </View>
+      </TouchableOpacity>
         {error && (
         <Text style={styles.error}> {error} </Text>
       )}</View>
