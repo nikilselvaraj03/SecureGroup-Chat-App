@@ -143,7 +143,7 @@ const userInfromation = async () => {
                 style={{
                   fontSize: 19,
                   fontWeight: 500,
-                  color: "black",
+                  color: "#673AB7",
                   marginRight: "10%",
                 }}
               >
@@ -154,7 +154,7 @@ const userInfromation = async () => {
               <Icon
                 name="information-circle-outline"
                 size={26}
-                color="black"
+                color="#673AB7"
                 onPress={() => navigation.navigate('GroupProfileScreen', { groupId:groupId, groupName:groupName})
                 }
               ></Icon>

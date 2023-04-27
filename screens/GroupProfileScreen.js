@@ -33,7 +33,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import React, { useEffect, useState } from "react";
 import MultiSelect from "react-native-multiple-select";
 
-const GroupProfileScreen = ({ route,navigation }) => {
+const GroupProfileScreen = ({ route, navigation }) => {
   const [groupinfo, setGroupinfo] = useState({});
   const [participant, setParticipant] = useState([]);
   const [userDocs, setUserDocs] = useState([]);
@@ -41,8 +41,6 @@ const GroupProfileScreen = ({ route,navigation }) => {
   const [participantsData, setParticipantsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const { groupId, groupName } = route.params;
-
-
 
   const fetchUserData = async () => {
     const usersCollection = collection(db, "users");
@@ -72,11 +70,7 @@ const GroupProfileScreen = ({ route,navigation }) => {
   const addParticipants = () => {
     let data = selectedItems;
 
-    const chatDocRef = doc(
-      db,
-      "Groups",
-      groupId
-    );
+    const chatDocRef = doc(db, "Groups", groupId);
     data.forEach((element) => {
       updateDoc(chatDocRef, {
         participants: arrayUnion(element),
@@ -95,7 +89,6 @@ const GroupProfileScreen = ({ route,navigation }) => {
       const groupData = docSnap.data();
       setGroupinfo(groupData);
       console.log("doc data", groupinfo);
-    
 
       const participantIds = groupData.participants;
       const participantDataPromises = participantIds.map(
@@ -132,15 +125,12 @@ const GroupProfileScreen = ({ route,navigation }) => {
   };
 
   const handleDeleteParticipant = async (userId) => {
-    const chatDocRef = doc(
-      db,
-      "Groups",
-      groupId
-    );
+    const chatDocRef = doc(db, "Groups", groupId);
     await updateDoc(chatDocRef, {
       participants: arrayRemove(userId),
     }).then(async () => {
       console.log("participant deleted");
+      alert("Participant Removed");
       setParticipantsData((prevData) =>
         prevData.filter((item) => item.userId !== userId)
       );
@@ -148,14 +138,12 @@ const GroupProfileScreen = ({ route,navigation }) => {
   };
 
   const handleDeleteGroup = async () => {
-    const groupDocRef = doc(
-      db,
-      "Groups",
-      groupId
-    );
+    const groupDocRef = doc(db, "Groups", groupId);
     await deleteDoc(groupDocRef);
     console.log("Group deleted");
-    navigation.goBack(); // or navigate to another screen
+    alert("Group Deleted");
+    navigation.popToTop();
+    // or navigate to another screen
   };
 
   useEffect(() => {
@@ -171,16 +159,17 @@ const GroupProfileScreen = ({ route,navigation }) => {
     <View style={styles.loginContainer}>
       <StatusBar barStyle="light-content" />
       <SafeAreaView>
+      <ScrollView>
         <View>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Icon name="chevron-back-outline" size={26} color="black" />
+            <Icon name="chevron-back-outline" size={26} color="#673AB7" />
             <Text
               style={{
                 fontSize: 20,
-                color: "black",
+                color: "#673AB7",
               }}
             >
               Back
@@ -196,10 +185,10 @@ const GroupProfileScreen = ({ route,navigation }) => {
             style={{
               marginTop: "3%",
               textAlign: "center",
-              fontSize: 24,
+              fontSize: 26,
               fontWeight: "500",
 
-              color: "black",
+              color: "#673AB7",
             }}
           >
             {groupName}
@@ -211,7 +200,7 @@ const GroupProfileScreen = ({ route,navigation }) => {
               fontSize: 15,
               fontWeight: "300",
 
-              color: "black",
+              color: "#673AB7",
             }}
           >
             4 Members
@@ -241,7 +230,7 @@ const GroupProfileScreen = ({ route,navigation }) => {
             <Text
               style={{
                 fontSize: 18,
-                color: "purple",
+                color: "white",
                 fontFamily: "Times New Roman",
               }}
             >
@@ -272,7 +261,7 @@ const GroupProfileScreen = ({ route,navigation }) => {
                 <TouchableOpacity
                   onPress={() => handleDeleteParticipant(item.userId)}
                 >
-                  <Icon name="trash-outline" size={20} color="#FF4500" />
+                  <Icon name="trash-outline" size={20} color="#DC143C" />
                 </TouchableOpacity>
               </View>
             );
@@ -284,7 +273,7 @@ const GroupProfileScreen = ({ route,navigation }) => {
             <Text
               style={{
                 fontSize: 18,
-                color: "#FF4500",
+                color: "white",
                 fontFamily: "Times New Roman",
               }}
               onPress={handleDeleteGroup}
@@ -293,19 +282,20 @@ const GroupProfileScreen = ({ route,navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.shareGroup}>
+        {/* <View style={styles.shareGroup}>
           <TouchableOpacity>
             <Text
               style={{
                 fontSize: 18,
-                color: "blue",
+                color: "white",
                 fontFamily: "Times New Roman",
               }}
             >
               Share Group Link
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -316,12 +306,12 @@ const styles = StyleSheet.create({
   loginContainer: {
     paddingTop: StatusBar.currentHeight,
     flex: 1,
-    backgroundColor: "#d3d3d3",
+    backgroundColor: "white",
     marginBottom: 0,
   },
   divider: {
     height: 0.6,
-    backgroundColor: "#d3d3d3",
+    backgroundColor: "white",
     marginVertical: 2,
   },
   backButton: {
@@ -372,19 +362,20 @@ const styles = StyleSheet.create({
     color: "black",
   },
   deleteGroup: {
-    margin: 20,
-    backgroundColor: "whitesmoke",
+    margin: 40,
+    backgroundColor: "#DC143C",
     height: 35,
-    borderRadius: 10,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
   },
   shareGroup: {
-    marginLeft: 20,
-    marginRight: 14,
-    backgroundColor: "whitesmoke",
+    marginLeft: 40,
+    marginRight: 40,
+
+    backgroundColor: "#673AB7",
     height: 35,
-    borderRadius: 10,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
   },

@@ -108,7 +108,6 @@ const LandingScreen = ({ navigationParam, userinfo }) => {
       </SafeAreaView>
     );
   };
- 
   useEffect(() => {
     const getGroupInfo = async () => {
       const currentUser = auth.currentUser.uid;
@@ -116,33 +115,37 @@ const LandingScreen = ({ navigationParam, userinfo }) => {
       const docSnap = await getDoc(docRef);
       const currentUserData = docSnap.data();
       setDelgrp(currentUserData);
-      const disappearedGroup = currentUserData.groups.filter((groupId) => groupId);
-      // Update disappearedGroup array with the latest data
-      setDisappearedGroup(disappearedGroup);
-      const currentDate = new Date().toLocaleDateString('en-GB'); // format the current date as 'DD/MM/YYYY'
-      
+      const disappearedGroup = delgrp.groups.filter((groupId) => groupId);
+
+      const currentDate = new Date().toLocaleDateString("en-GB"); // format the current date as 'DD/MM/YYYY'
+
       disappearedGroup.forEach(async (groupId) => {
         const groupRef = doc(db, "Groups", groupId);
         const groupSnap = await getDoc(groupRef);
         const groupData = groupSnap.data();
         console.log("see group data here", groupData.selectedDate);
         console.log("see current date here", currentDate);
-        if (formatDate(groupData.selectedDate) === currentDate) {
+        const groupDate = formatDate(groupData.selectedDate);
+        if (
+          typeof groupDate === "string" &&
+          typeof currentDate === "string" &&
+          groupDate === currentDate
+        ) {
+          console.log("Date", formatDate(groupData.selectedDate));
           await deleteDoc(doc(db, "Groups", groupId));
           console.log("group deleted");
         }
       });
     };
-    
+
     const formatDate = (dateStr) => {
       const dateObj = new Date(dateStr);
       const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
-      return `${day}/${month}/${year}`;
-    }
-    
-  
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
     async function fetchData() {
       if (userinfo && userinfo.groups) {
         let q = query(todoRef, where("Groupid", "in", userinfo.groups));
@@ -157,12 +160,11 @@ const LandingScreen = ({ navigationParam, userinfo }) => {
         // console.log("checking for grpid:",groups)
       }
     }
-  
+
     fetchData();
     getGroupInfo();
     // deleteGroup();
   }, [userinfo]);
-  
 
   const handleSearch = (query) => {
     if (!query || query == "") {

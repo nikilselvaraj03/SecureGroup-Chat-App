@@ -108,6 +108,7 @@ const NewGroupScreen = ({ userToken }) => {
     }).then(() => {
       console.log("Group created");
       setAddData("");
+      alert("Group Created");
     });
     let recors = selectedItems;
     recors.forEach((element) => {
@@ -184,92 +185,94 @@ const NewGroupScreen = ({ userToken }) => {
   };
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor="black" />
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Icon name="chevron-back-outline" size={26} color="#673AB7"></Icon>
-          <Text
-            style={{
-              fontSize: 20,
-              color: "#673AB7",
-            }}
-          >
-            Back
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.body}>
-        <View style={styles.container}>
-          <TouchableOpacity
-            style={styles.groupImageContainer}
-            onPress={handleImagePicker}
-          >
-            {groupImage ? (
-              <Image style={styles.groupImage} source={{ uri: groupImage }} />
-            ) : (
-              <>
-                <Icon name="image-outline" size={40} color="#919191" />
-              </>
-            )}
-          </TouchableOpacity>
-          <Text style={{ marginBottom: 10, textAlign: "center" }}>
-            Select Group Profile Image
-          </Text>
-          <Text style={styles.label}>Group Name</Text>
-          <TextInput
-            style={styles.inputField}
-            placeholder="Enter group name"
-            value={addData}
-            onChangeText={(Name) => setAddData(Name)}
-          />
-
-          <MultiSelect
-            items={userDocs}
-            uniqueKey="userId"
-            onSelectedItemsChange={setSelectedItems}
-            selectedItems={selectedItems}
-            selectText="Search participants to add"
-            searchInputPlaceholderText="Search options..."
-            searchInputStyle={{ borderRadius: 5 }}
-            tagRemoveIconColor="#d3d3d3"
-            tagBorderColor="#d3d3d3"
-            tagTextColor="#d3d3d3"
-            selectedItemTextColor="#d3d3d3"
-            selectedItemIconColor="#d3d3d3"
-            itemTextColor="black"
-            displayKey="first_name"
-            hideSubmitButton={true}
-          />
-
-          <View style={styles.disapper}>
-            <Text style={styles.label}>Disappearing Group</Text>
-            <Switch
-              value={isDisappearingGroup}
-              onValueChange={setIsDisappearingGroup}
-            />
-          </View>
-          {isDisappearingGroup ? (
-            <RNDateTimePicker
-              value={new Date(selectedDate)}
-              display={Platform.OS == "ios" ? "spinner" : "calendar"}
-              mode="date"
-              style={styles.rnd}
-              minimumDate={new Date()}
-              onChange={(event, date) => handleDateChange(date)}
-            />
-          ) : (
-            ""
-          )}
-
-          <TouchableOpacity
-            style={styles.createGroupButton}
-            onPress={handleCreateGroup}
-          >
-            <Text style={styles.createGroupButtonText}>Create Group</Text>
-          </TouchableOpacity>
+      <ScrollView>
+        <StatusBar backgroundColor="black" />
+        <View style={styles.header}>
+          {/* <TouchableOpacity style={styles.backButton} onPress={navigation.goBack()}>
+            <Icon name="chevron-back-outline" size={26} color="#673AB7"></Icon>
+            <Text
+              style={{
+                fontSize: 20,
+                color: "#673AB7",
+              }}
+            >
+              Back
+            </Text>
+          </TouchableOpacity> */}
         </View>
-      </View>
+
+        <View style={styles.body}>
+          <View style={styles.container}>
+            <TouchableOpacity
+              style={styles.groupImageContainer}
+              onPress={handleImagePicker}
+            >
+              {groupImage ? (
+                <Image style={styles.groupImage} source={{ uri: groupImage }} />
+              ) : (
+                <>
+                  <Icon name="image-outline" size={40} color="#919191" />
+                </>
+              )}
+            </TouchableOpacity>
+            {/* <Text style={{ marginBottom: 10, textAlign: "center" }}>
+              Select Group Profile Image
+            </Text> */}
+            <Text style={styles.label}>Group Name</Text>
+            <TextInput
+              style={styles.inputField}
+              placeholder="Enter group name"
+              value={addData}
+              onChangeText={(Name) => setAddData(Name)}
+            />
+
+            <MultiSelect
+              items={userDocs}
+              uniqueKey="userId"
+              onSelectedItemsChange={setSelectedItems}
+              selectedItems={selectedItems}
+              selectText="Search participants to add"
+              searchInputPlaceholderText="Search options..."
+              searchInputStyle={{ borderRadius: 5 }}
+              tagRemoveIconColor="#d3d3d3"
+              tagBorderColor="#d3d3d3"
+              tagTextColor="#d3d3d3"
+              selectedItemTextColor="#d3d3d3"
+              selectedItemIconColor="#d3d3d3"
+              itemTextColor="black"
+              displayKey="first_name"
+              hideSubmitButton={true}
+            />
+
+            <View style={styles.disapper}>
+              <Text style={styles.label}>Disappearing Group</Text>
+              <Switch
+                value={isDisappearingGroup}
+                onValueChange={setIsDisappearingGroup}
+              />
+            </View>
+            {isDisappearingGroup ? (
+              <RNDateTimePicker
+                value={new Date(selectedDate)}
+                display={Platform.OS == "ios" ? "spinner" : "calendar"}
+                mode="date"
+                style={styles.rnd}
+                minimumDate={new Date()}
+                onChange={(event, date) => handleDateChange(date)}
+              />
+            ) : (
+              ""
+            )}
+
+            <TouchableOpacity
+              style={styles.createGroupButton}
+              onPress={handleCreateGroup}
+            >
+              <Text style={styles.createGroupButtonText}>Create Group</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -277,11 +280,11 @@ const NewGroupScreen = ({ userToken }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#d3d3d3",
+    backgroundColor: "white",
   },
   header: {
     height: 50,
-    backgroundColor: "#d3d3d3",
+    backgroundColor: "white",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -330,14 +333,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
+    marginTop: 5,
+    color: "#673AB7",
   },
   inputField: {
     height: 40,
     borderWidth: 1,
-    borderColor: "#d3d3d3",
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 20,
+    borderBottomWidth: 1,
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    borderColor: "#B388FF",
+    backgroundColor: "transparent",
   },
   createGroupButton: {
     backgroundColor: "#673AB7",
