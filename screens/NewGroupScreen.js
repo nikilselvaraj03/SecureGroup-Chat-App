@@ -60,7 +60,7 @@ const NewGroupScreen = ({ userToken }) => {
     setSelectedDate(newDate);
   };
 
-// 
+  //
 
   const handleImagePicker = () => {
     launchImageLibrary(
@@ -75,12 +75,11 @@ const NewGroupScreen = ({ userToken }) => {
       }
     );
   };
-  
 
-   const deleteDocsByDate = async (collectionName, date) => {
+  const deleteDocsByDate = async (collectionName, date) => {
     try {
       const collectionRef = db.collection(collectionName);
-      const query = collectionRef.where('selectedDate', '==', date);
+      const query = collectionRef.where("selectedDate", "==", date);
       const snapshot = await query.get();
       snapshot.forEach((doc) => {
         doc.ref.delete();
@@ -90,7 +89,7 @@ const NewGroupScreen = ({ userToken }) => {
       console.error(error);
       return false; // Return false if there's an error
     }
-  }
+  };
 
   const handleCreateGroup = async () => {
     // handle creating a new group with the groupName and groupImage values
@@ -99,10 +98,10 @@ const NewGroupScreen = ({ userToken }) => {
     const docRef = await setDoc(doc(db, "Groups", uniqueId), {
       Creationtime: new Date(),
       Groupid: uniqueId,
+      Admin: auth.currentUser.uid,
       Name: addData,
       // groupImage: "",
-      // participants: selectedItems,
-      admin: 34,
+      participants: auth.currentUser.uid,
       isDisappearingGroup,
       // admin: Auth.currentuser.uid,
       selectedDate: isDisappearingGroup ? selectedDate : null,
@@ -116,37 +115,14 @@ const NewGroupScreen = ({ userToken }) => {
         requests: arrayUnion(uniqueId),
       });
     });
+    const cuser = auth.currentUser.uid;
+    const docRefer1 = updateDoc(doc(db, "users", cuser), {
+      groups: arrayUnion(uniqueId),
+    });
     setSelectedItems([]);
     setSelectedDate(null);
     setIsDisappearingGroup(false);
-
-    // isDisappearingGroup:false
   };
-
-  // useEffect(() => {
-  //   // setDocId(documentIdInput)
-  //   const fetchUserData = async () => {
-  //     // const userDocRef = doc(db, 'users');
-
-  //     // const colRef = collection(db, "users");
-  //     // const userDocRef = await getDocs(colRef);
-  //     const snapshot = await firebase.firestore().collection('users').get()
-  //     console.log("heyy",snapshot);
-  //     // try {
-  //     //   const docSnapshot = await getDoc(userDocRef);
-  //     //   if (docSnapshot.exists()) {
-  //     //     setUserData(docSnapshot.data());
-  //     //     console.log(userData);
-  //     //     // const arr =[userData.first_name];
-  //     //   } else {
-  //     //     console.log('No such document!');
-  //     //   }
-  //     // } catch (error) {
-  //     //   console.log('Error getting document:', error);
-  //     // }
-  //   };
-  //   fetchUserData();
-  // }, []);
 
   const fetchUserData = async () => {
     const usersCollection = collection(db, "users");
@@ -200,45 +176,8 @@ const NewGroupScreen = ({ userToken }) => {
     };
 
     fetchUserData();
-    deleteDocsByDate('Groups', new Date());
+    deleteDocsByDate("Groups", new Date());
   }, []);
-
-  // useEffect(() => {
-
-  //   async function fetchUserInfo() {
-
-  //     try {
-  //       const snapshot = await firebase.firestore().collection('users').get()
-  //       console.log(snapshot);
-  //   } catch (error) {
-  //       console.log(error);
-  //   }
-  //   }
-
-  //   fetchUserInfo();
-  // })
-
-  // async function fetchParticipants(participantIds) {
-  //   const participantNames = [];
-  //   for (const userId of participantIds) {
-  //     const docRef = doc(db, "users", userId);
-  //     const docSnap = await getDoc(docRef);
-  //     if (docSnap.exists()) {
-  //       const participant = docSnap.data();
-  //       participantNames.push(participant.first_name);
-  //     } else {
-  //       console.log("No such document!");
-  //     }
-  //   }
-  //   setParticipants(participantNames);
-  // }
-
-  // const options = [
-  //   { id: 1, name: "Option 1" },
-  //   { id: 2, name: "Option 2" },
-  //   { id: 3, name: "Option 3" },
-  //   { id: 4, name: "Option 4" },
-  // ];
 
   const handleSelectedItems = (selectedItems) => {
     setSelectedItems(selectedItems);
@@ -313,6 +252,7 @@ const NewGroupScreen = ({ userToken }) => {
           {isDisappearingGroup ? (
             <RNDateTimePicker
               value={new Date(selectedDate)}
+              display={Platform.OS == "ios" ? "spinner" : "calendar"}
               mode="date"
               style={styles.rnd}
               minimumDate={new Date()}

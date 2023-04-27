@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
+import GroupProfileScreen from "./GroupProfileScreen";
 import uuid from "uuid";
 import {
   SafeAreaView,
@@ -33,6 +34,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 const ChatScreen = ({ route, navigation }) => {
   const [messages, setMessages] = useState({});
   const [message, setMessage] = useState("");
+  const [userInfo, setuserinfo] = useState("");
   const [text, setText] = useState("");
   const { groupId, groupName } = route.params;
 
@@ -42,9 +44,9 @@ const ChatScreen = ({ route, navigation }) => {
     if (docSnap.exists()) {
       const messagesData = docSnap.data();
       setMessages(messagesData);
-      console.log("doc data", messages);
+      console.log("checking messages.group_id",groupId)
     } else {
-      console.log("no data found");
+      console.log("no msg data found");
     }
   };
 
@@ -53,7 +55,18 @@ const ChatScreen = ({ route, navigation }) => {
     // alert(groupId);
     // alert(groupName);
     getMessages();
+    userInfromation();
   }, [groupId]);
+//
+const userInfromation = async () => {
+  const currentuser=auth.currentUser.uid;
+  const docRefer = doc(db, "users",currentuser);
+  const docSnap = await getDoc(docRefer);
+  const userInfo = docSnap.data();
+  setuserinfo(userInfo);
+};
+
+
 
   const sendMessage = async () => {
     const uniqueId = uuid.v4();
@@ -67,8 +80,8 @@ const ChatScreen = ({ route, navigation }) => {
         group_name: groupName,
         message: [
           {
-            first_name: "sarvesh",
-            last_name: "remb",
+            first_name: userInfo.first_name,
+            last_name: userInfo.last_name,
             message_id: uniqueId,
             message_text: text,
             user_id: auth.currentUser.uid,
@@ -80,8 +93,8 @@ const ChatScreen = ({ route, navigation }) => {
       });
     } else {
       let newData = {
-        first_name: "Sarvesh",
-        last_name: "rem",
+        first_name: userInfo.first_name,
+        last_name: userInfo.last_name,
         message_id: uniqueId,
         message_text: text,
         user_id: auth.currentUser.uid,
@@ -92,100 +105,10 @@ const ChatScreen = ({ route, navigation }) => {
         console.log("data updated");
         setText("");
         await getMessages();
-        // const updatedDocSnap = await getDoc(chatDocRef);
-        // const updatedMessagesData = updatedDocSnap.data();
-        // setMessages(updatedMessagesData);
       });
     }
   };
-  // const sendMessage = async () => {
-  //   console.log("sending chat data");
-
-  //   const uniqueId = uuid.v4();
-  //   const chatDocRef = doc(db, "chats", "new group");
-
-  //   const chatDocSnapshot = await getDoc(chatDocRef);
-  //   const chatDocData = chatDocSnapshot.data();
-  //   if (!chatDocData) {
-  //   console.log("there is no data");
-  //   const docRef = await setDoc(doc(db, "chats", "new group"), {
-  //     group_id:"sjch",
-  //     group_name: "newgrp",
-  //   })
-  //   let newData = {
-  //     first_name: "Sarvesh",
-  //     last_name: "rem",
-  //     message_id: uniqueId,
-  //     message_text: text,
-  //     user_id: "sample",
-  //   };
-  //   :(newData);
-  //   }
-  //   else{
-
-  //   let newData = {
-  //     first_name: "Sarvesh",
-  //     last_name: "rem",
-  //     message_id: uniqueId,
-  //     message_text: text,
-  //     user_id: "sample",
-  //   };
-  //   // const docRef = await setDoc(doc(db, "chats", "new group"), {
-  //   //   group_id:"sjch",
-  //   //   group_name: "newgrp",
-  //   // })
-
-  //   if (!chatDocData.group_id || !chatDocData.group_name) {
-  //     const docRef = await setDoc(doc(db, "chats", "new group"), {
-  //       group_id:"sjch",
-  //       group_name: "newgrp",
-  //     })
-  //   }
-
-  //   await updateDoc(chatDocRef, {
-  //     message: arrayUnion(newData),
-  //   }).then(async () => {
-  //     console.log("data sent");
-  //     setText("");
-  //     const updatedDocSnap = await getDoc(chatDocRef);
-  //     const updatedMessagesData = updatedDocSnap.data();
-  //     setMessages(updatedMessagesData);
-  //   });
-  // };
-  // }
-  // const sendMessage = async () => {
-  //   console.log("sending chat data");
-  //   const uniqueId = uuid.v4();
-  //   const chatDocRef = doc(db, "chats", "new group");
-
-  //   const chatDocSnapshot = await getDoc(chatDocRef);
-  //   const chatDocData = chatDocSnapshot.data();
-
-  //   let newData = {
-  //     first_name: "Sarvesh",
-  //     last_name: "rem",
-  //     message_id: uniqueId,
-  //     message_text: text,
-  //     user_id: "sample",
-  //   };
-
-  //   if (!chatDocData.group_id || !chatDocData.group_name) {
-  //     updateDoc(chatDocRef, {
-  //       group_id: "testing",
-  //       group_name: "FRIENDS",
-  //     });
-  //   }
-
-  //   await updateDoc(chatDocRef, {
-  //     message: arrayUnion(newData),
-  //   }).then(async () => {
-  //     console.log("data sent");
-  //     setText("");
-  //     const updatedDocSnap = await getDoc(chatDocRef);
-  //     const updatedMessagesData = updatedDocSnap.data();
-  //     setMessages(updatedMessagesData);
-  //   });
-  // };
+  
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -232,7 +155,8 @@ const ChatScreen = ({ route, navigation }) => {
                 name="information-circle-outline"
                 size={26}
                 color="black"
-                onPress={() => navigation.navigate("GroupProfileScreen")}
+                onPress={() => navigation.navigate('GroupProfileScreen', { groupId:groupId, groupName:groupName})
+                }
               ></Icon>
             </TouchableOpacity>
           </View>

@@ -33,24 +33,17 @@ import Icon from "react-native-vector-icons/Ionicons";
 import React, { useEffect, useState } from "react";
 import MultiSelect from "react-native-multiple-select";
 
-const GroupProfileScreen = ({ navigation }) => {
+const GroupProfileScreen = ({ route,navigation }) => {
   const [groupinfo, setGroupinfo] = useState({});
   const [participant, setParticipant] = useState([]);
   const [userDocs, setUserDocs] = useState([]);
   // const [groupinfo, setGroupinfo] = useState({});
   const [participantsData, setParticipantsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-  // const getGroupInfo = async () => {
-  //   const docRef = doc(db, "Groups", "6fc5bc75-ab9e-4db8-b10e-5e4a6b517e91");
-  //   const docSnap = await getDoc(docRef);
-  //   if (docSnap.exists()) {
-  //     const GroupData = docSnap.data();
-  //     setGroupinfo(GroupData);
-  //     console.log("doc data", GroupData);
-  //   } else {
-  //     console.log("no data found");
-  //   }
-  // };
+  const { groupId, groupName } = route.params;
+
+
+
   const fetchUserData = async () => {
     const usersCollection = collection(db, "users");
     const usersQuery = query(usersCollection, where("first_name", "!=", "")); // example query to filter documents
@@ -82,7 +75,7 @@ const GroupProfileScreen = ({ navigation }) => {
     const chatDocRef = doc(
       db,
       "Groups",
-      "6fc5bc75-ab9e-4db8-b10e-5e4a6b517e91"
+      groupId
     );
     data.forEach((element) => {
       updateDoc(chatDocRef, {
@@ -96,13 +89,13 @@ const GroupProfileScreen = ({ navigation }) => {
   };
 
   const getGroupInfo = async () => {
-    const docRef = doc(db, "Groups", "6fc5bc75-ab9e-4db8-b10e-5e4a6b517e91");
+    const docRef = doc(db, "Groups", groupId);
     const docSnap = await getDoc(docRef);
-
     if (docSnap.exists()) {
       const groupData = docSnap.data();
       setGroupinfo(groupData);
-      console.log("doc data", groupData);
+      console.log("doc data", groupinfo);
+    
 
       const participantIds = groupData.participants;
       const participantDataPromises = participantIds.map(
@@ -134,7 +127,7 @@ const GroupProfileScreen = ({ navigation }) => {
           console.log("Error fetching participant data:", error);
         });
     } else {
-      console.log("no data found");
+      console.log("no participant data found");
     }
   };
 
@@ -142,7 +135,7 @@ const GroupProfileScreen = ({ navigation }) => {
     const chatDocRef = doc(
       db,
       "Groups",
-      "6fc5bc75-ab9e-4db8-b10e-5e4a6b517e91"
+      groupId
     );
     await updateDoc(chatDocRef, {
       participants: arrayRemove(userId),
@@ -158,7 +151,7 @@ const GroupProfileScreen = ({ navigation }) => {
     const groupDocRef = doc(
       db,
       "Groups",
-      "6fc5bc75-ab9e-4db8-b10e-5e4a6b517e91"
+      groupId
     );
     await deleteDoc(groupDocRef);
     console.log("Group deleted");
@@ -209,7 +202,7 @@ const GroupProfileScreen = ({ navigation }) => {
               color: "black",
             }}
           >
-            {groupinfo.Name}
+            {groupName}
           </Text>
           <Text
             style={{
