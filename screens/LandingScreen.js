@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
+import { collection, doc, getDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-root-toast';
@@ -33,7 +33,7 @@ const [likedGroups, setLikedGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [filteredGroups, setFilteredGroups] = useState(groups);
-
+  const [isLoading,setisLoading] =  useState(true)
   const isEmptyGroups= () =>{
     return !(groups && groups.length > 0) || (filteredGroups && filteredGroups.length)
   }
@@ -72,11 +72,12 @@ const [likedGroups, setLikedGroups] = useState([]);
 
     /> ): (<></>)
     }
-    {isEmptyGroups() ? <View style={{flex:1, alignItems:'center', justifyContent:'center'}}> 
+    {isEmptyGroups() && !isLoading ? <View style={{flex:1, alignItems:'center', justifyContent:'center'}}> 
         <Image source={require("../assets/images/uhoh.png")} style={{height:130,width:180}}/><Text style={{fontFamily:'Caveat-Bold', textAlign:'center', fontSize:24,letterSpacing:1.1, color:'grey'}}>{"\n\n"}Seems like you are'nt in any groups{"\n\n"} Go ahead and create one.</Text>
         </View>:<></>}
   </SafeAreaView>)}
   const fetchData = async () => {
+    setisLoading(true);
     if (userinfo && userinfo.groups) {
       const docRef = doc(db, 'users', userinfo.userId);
       const groups = await (await getDoc(docRef)).data().groups;
@@ -88,21 +89,42 @@ const [likedGroups, setLikedGroups] = useState([]);
         querySnapshot.forEach((doc) => {
           rtrgroups.push(doc.data());
         });
-        if(groups != rtrgroups){
         setGroups(rtrgroups);
-        }
+        deleteDisappearedGroups()
       }
     }
+    setisLoading(false)
   };
 
   useEffect(() => {
     navigation.addListener('focus', (e) => {
+      
       fetchData()
     });
     fetchData()
   }, [userinfo]);
 
-    
+  
+  const deleteDisappearedGroups = ()=> {
+    console.log('in dissapearing groups:',JSON.stringify(groups))
+      const currentDate = new Date() // format the current date as 'DD/MM/YYYY'
+      groups.forEach(async (group) => {
+        if(group.isDisappearingGroup) {
+        console.log('in dissapearing groups')
+        const milliseconds = group.selectedDate.seconds * 1000 + Math.floor(group.selectedDate.nanoseconds / 1000000);
+        console.log("see current date here", currentDate);
+        let selectedDate = new Date()
+        selectedDate.setTime(milliseconds);
+        console.log("see selected formatted", selectedDate);
+        if (selectedDate.getDate() === currentDate.getDate() 
+        && selectedDate.getMonth() === currentDate.getMonth()
+        && selectedDate.getFullYear() === currentDate.getFullYear()) {
+          await deleteDoc(doc(db, "Groups", group.Groupid));
+          console.log("group deleted");
+        }}
+      });
+    };
+
   const handleSearch = (query) => {
     if(!query || query == ''){
       setSearchQuery('')

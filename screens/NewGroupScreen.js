@@ -16,10 +16,10 @@ import {
   getFirestore,
   firestore,
   arrayUnion,
-  query,
   where,
   getDocs,
-  Query,
+  deleteDoc,
+  query
 } from "firebase/firestore";
 import uuid from "uuid";
 import { Firestore } from "firebase/app";
@@ -159,18 +159,18 @@ const uniqueName = () => {
 
   
   const deleteDocsByDate = async (collectionName, date) => {
-    try {
-      const collectionRef = collection(db,collectionName);
-      const query = Query(collectionRef,where("selectedDate", "==", date));
-      const snapshot = await getDocs(query);
-      snapshot.forEach((doc) => {
-        doc.ref.delete();
-      });
-      return true; // Return true if the documents are successfully deleted
-    } catch (error) {
-      console.error(error);
-      return false; // Return false if there's an error
-    }
+    // try {
+    //   const collectionRef = collection(db,collectionName);
+    //   const query = query(collectionRef,where("selectedDate", "==", date));
+    //   const snapshot = await getDocs(query);
+    //   snapshot.forEach((docu) => {
+    //     deleteDoc(doc(db,collectionName,docu.Groupid));
+    //   });
+    //   return true; // Return true if the documents are successfully deleted
+    // } catch (error) {
+    //   console.error(error);
+    //   return false; // Return false if there's an error
+    // }
   };
 
   const handleCreateGroup = async () => {
@@ -271,7 +271,6 @@ const uniqueName = () => {
   };
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView>
         <StatusBar backgroundColor="black" />
         <View style={styles.header}>
           {/* <TouchableOpacity style={styles.backButton} onPress={navigation.goBack()}>
@@ -359,7 +358,6 @@ const uniqueName = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
     </SafeAreaView>
   );
 };

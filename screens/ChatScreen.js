@@ -172,7 +172,7 @@ const userInfromation = async () => {
                   return (
                     <>
                       {item.user_id != auth.currentUser.uid ? (
-                        <Text
+                        <Text key={item.message_id + " _name"}
                           style={{
                             fontSize: 15,
                             color: "purple",

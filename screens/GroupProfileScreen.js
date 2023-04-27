@@ -161,7 +161,6 @@ const GroupProfileScreen = ({ route, navigation }) => {
     <View style={styles.loginContainer}>
       <StatusBar barStyle="light-content" />
       <SafeAreaView>
-      <ScrollView>
         <View>
           <TouchableOpacity
             style={styles.backButton}
@@ -206,7 +205,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
               color: "#424242",
             }}
           >
-            {participantsData.length} members
+            {participantsData.length} {participantsData.length == 1 ? 'Member' : 'Members'}
           </Text>
         </View>
         <View style={styles.multiselect}>
@@ -298,7 +297,6 @@ const GroupProfileScreen = ({ route, navigation }) => {
             </Text>
           </TouchableOpacity>
         </View> */}
-        </ScrollView>
       </SafeAreaView>
     </View>
   );
