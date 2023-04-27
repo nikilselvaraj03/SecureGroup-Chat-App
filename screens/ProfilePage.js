@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, SafeAreaView, StyleSheet,TouchableOpacity, TextInput, } from 'react-native';
-import {Avatar, Title, Caption,TouchableRipple} from 'react-native-paper';
+import { View,Image, Text, SafeAreaView, StyleSheet,TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, } from 'react-native';
+import {Avatar, Title, Caption,TouchableRipple, ActivityIndicator} from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import { collection, doc, getDoc, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+import { signOut } from 'firebase/auth';
 
 
 
@@ -25,6 +26,7 @@ const ProfilePage = ({userinfo}) => {
   const [editedLastName, setEditedLastName] = useState(''); 
   const [dob, setDob] = useState(userinfo.date_of_birth);
   const [editeddob, setEditeddob] = useState(''); 
+  const [isSigningOut,setIsSigningOut] = useState(false)
 
 
   const handleEditPress = () => {
@@ -34,11 +36,45 @@ const ProfilePage = ({userinfo}) => {
     setEditeddob(formattedDob);
 
   };
-  const handleSavePress = () => {
+  function validate(){
+    let isValid = true;
+    let error_des = ''
+    if (!editedFirstName && !editedLastName  && !editeddob) {
+      error_des='Please input all the required fields';
+      isValid = false;
+    }
+    else if (!editedFirstName && !editedLastName) {
+      error_des='Please input FirstName and LastName';
+      isValid = false;
+    }
+    else if (!editedFirstName) {
+      error_des='Please input FirstName';
+      isValid = false;
+    }
+     else if (!editedLastName) {
+      error_des='Please input LastName';
+      isValid = false;
+    } else if (!editeddob) {
+      error_des='Please input your Birth date';
+      isValid = false;
+    } 
+    if(!isValid) {
+      alert(error_des)
+    }
+    return isValid
+  }
+  const handleSavePress = async () => {
+    if(validate()){
     setIsEditing(false);
     setFirstName(editedFirstName); // Disable editing mode
     setLastName(editedLastName);
     setDob(editeddob);
+    const userDocRef = doc(db, "users", userinfo.userId);
+    await updateDoc(userDocRef, {
+      first_name:editedFirstName,
+      last_name:editedLastName,
+      date_of_birth:editeddob
+    })}
   };
 
   const handleCanclePress = () => {
@@ -46,6 +82,17 @@ const ProfilePage = ({userinfo}) => {
     setFirstName(firstName); // Disable editing mode
     setLastName(LastName);
     setDob(dob);
+  };
+
+  const handleSignOut = () => {
+    setIsSigningOut(true)
+    signOut(auth).then(() => {
+      setTimeout(()=>{setIsSigningOut(false);navigation.navigate('Login')},800)
+      
+      
+    }).catch((error) => {
+      setIsSigningOut(false)
+    });
   };
   
 
@@ -63,10 +110,11 @@ const ProfilePage = ({userinfo}) => {
 
   return(
     <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
         <View style={styles.userInfoSection}>
           <View style={{flexDirection: 'row', marginTop: 30, justifyContent: 'left', alignItems: 'left'}}>
             <Avatar.Image style={{backgroundColor:'#eaeaea'}}
-              source={userinfo && userinfo.profile_photo_url ? {uri:userinfo.profile_photo_url} : require('../assets/images/output.png')} size={120}/>
+              source={userinfo && userinfo.profile_photo_url ? {uri:userinfo.profile_photo_url} : require('../assets/images/avatarperson.png')} size={120}/>
              <View style={{marginLeft: 20}}>
               <Title style={[styles.title, {
                 marginTop:35, marginBottom:5
@@ -132,12 +180,6 @@ const ProfilePage = ({userinfo}) => {
     
         </View>
 
-        <View style={styles.menuItem}>
-          <FontAwesome name="envelope-o"  size={25} color='#673AB7' />
-          <Text style={[
-                styles.menuItemText
-              ]}>{userinfo.email}</Text>
-        </View>
 
         <View style={styles.menuItem}>
           <FontAwesome name="calendar"  size={25} color='#673AB7' />
@@ -165,7 +207,14 @@ const ProfilePage = ({userinfo}) => {
     
         </View>
 
-        <View style={styles.menuItem}>
+        <View style={[styles.menuItem, isEditing ?  styles.disabledMedniItem: '']}>
+          <FontAwesome name="envelope-o"  size={25} color='#673AB7' />
+          <Text style={[
+                styles.menuItemText
+              ]}>{userinfo.email}</Text>
+        </View>
+
+        <View style={[styles.menuItem, isEditing ?  styles.disabledMedniItem: '']}>
           <FontAwesome name="map-marker"  size={25} color='#673AB7'/>
           <Text style={[
                 styles.menuItemText
@@ -175,18 +224,24 @@ const ProfilePage = ({userinfo}) => {
         <View>
       {isEditing ? (
         <View style={{ flexDirection: 'row'}}>
-          <TouchableOpacity style={styles.buttonContainer} onPress={handleSavePress} >
-            <Text style={styles.buttonText}>Save</Text>
+          <TouchableOpacity style={styles.saveButtonContainer} onPress={handleSavePress} >
+            <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer} onPress={handleCanclePress}>
-            <Text style={styles.buttonText}>Cancle</Text>
+          <TouchableOpacity style={styles.cancelButtonContainer} onPress={handleCanclePress}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       ) : (
-       <View>
-       </View>
+        <TouchableOpacity style={styles.signoutButtonContainer} onPress={handleSignOut}>
+          { isSigningOut ? <ActivityIndicator size="small" color="#ffffff" style={{width: 18, height: 18,resizeMode : 'contain' }}/> :
+    <Image source={require('../assets/images/signout.png')} style={{width: 18, height: 18,resizeMode : 'contain' }}/> }
+    
+      <Text style={styles.signoutButtonText}>Signout</Text>
+    </TouchableOpacity>
       )}
+    
     </View>
+    </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
@@ -221,17 +276,49 @@ const styles = StyleSheet.create({
     color:'#757a79',
 
   },
-  buttonContainer: {
+  signoutButtonContainer: {
+    alignSelf:'center',
+    flexDirection:'row',
     borderRadius: 25, // Customize the border radius as per your preference
     backgroundColor: '#673AB7',
+    width: 140,
+    marginTop: 30,
+    paddingVertical: 10, // Customize the padding
+    paddingHorizontal: 12,
+    justifyContent:'space-around' // Customize the padding
+  },
+  signoutButtonText: {
+    color: 'white', // Customize the text color
+    fontSize: 18, // Customize the text size
+    textAlign: 'center', // Customize the text alignment
+  },
+  saveButtonContainer: {
+    borderRadius: 25, // Customize the border radius as per your preference
+    borderWidth:StyleSheet.hairlineWidth,
+    borderColor:'#689f38',
     width: 100,
     marginTop: 30, // Customize the background color
     marginLeft: 60,
     paddingVertical: 10, // Customize the padding
     paddingHorizontal: 12, // Customize the padding
   },
-  buttonText: {
-    color: 'white', // Customize the text color
+  saveButtonText: {
+    color: '#689f38', // Customize the text color
+    fontSize: 18, // Customize the text size
+    textAlign: 'center', // Customize the text alignment
+  },
+  cancelButtonContainer: {
+    borderRadius: 25, // Customize the border radius as per your preference
+    borderWidth:StyleSheet.hairlineWidth,
+    borderColor:'#d50000',
+    width: 100,
+    marginTop: 30, // Customize the background color
+    marginLeft: 60,
+    paddingVertical: 10, // Customize the padding
+    paddingHorizontal: 12, // Customize the padding
+  },
+  cancelButtonText: {
+    color: '#d50000', // Customize the text color
     fontSize: 18, // Customize the text size
     textAlign: 'center', // Customize the text alignment
   },
@@ -267,6 +354,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderBottomColor: '#dddddd',
     borderBottomWidth: 0.5,
+  }, disabledMedniItem:{
+    opacity:.4
   },
   action: {
     flexDirection: 'row',

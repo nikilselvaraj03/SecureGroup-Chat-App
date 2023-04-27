@@ -1,9 +1,10 @@
-import { StyleSheet, Keyboard, TextInput, Text, View, TouchableOpacity, KeyboardAvoidingView, Dimensions, ActivityIndicator } from 'react-native'
+import { StyleSheet, Keyboard, TextInput, Text, View, TouchableOpacity, KeyboardAvoidingView, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { auth, db } from '../firebase'
 import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import Toast from 'react-native-root-toast';
+import {ActivityIndicator} from 'react-native-paper';
 export default function PasswordRegistrationScreen({ route, navigation }) {
 
   const { email, first_name, last_name, date_of_birth, profilePhotoURL } = route.params
@@ -55,7 +56,9 @@ export default function PasswordRegistrationScreen({ route, navigation }) {
           last_name: last_name,
           date_of_birth: date_of_birth,
           userId: userCred.user.uid,
-          profile_photo_url : profilePhotoURL
+          profile_photo_url : profilePhotoURL,
+          requests:[],
+          groups:[]
         }).then(() => {
           console.log("Document written with ID: ", userCred.user.uid);
           Toast.show('Signup for TopDeck Successful.', {
@@ -94,7 +97,7 @@ export default function PasswordRegistrationScreen({ route, navigation }) {
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Choose a password for your account!</Text></View>
-      <KeyboardAvoidingView style={styles.inputContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView style={styles.inputContainer} behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
         <Text style={styles.inputTitle}>PASSWORD</Text>
         <TextInput secureTextEntry maxLength={16} style={styles.input} value={password} onChangeText={(password) => { setPassword(password); }} />
         <Text style={styles.inputTitle}>RE-ENTER PASSWORD</Text>

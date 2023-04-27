@@ -16,7 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 const home = 'Home';
-const profilePage = 'ProfilePage';
+const profile = 'Profile';
 const contacts = 'Requests';
 const creategroup = 'CreateGroup';
 
@@ -29,7 +29,7 @@ export default function Home({userToken}) {
   const [userinfo,setUserInfo] = useState(null);
   
   useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+    const unsubscribe = navigation.addListener('tabPress', (e) => {
       e.preventDefault();
     });
     let userInformation = null;
@@ -64,7 +64,7 @@ export default function Home({userToken}) {
                 tabBarIcon: ({focused, color, size}) => {
                     let iconName;
                     let rn = route.name;
-                    if(rn === profilePage){
+                    if(rn === profile){
                         iconName = focused ? 'person-circle-outline' : 'person-outline'
                     } else if (rn === contacts) {
                         iconName = focused ? 'list' : 'list-outline'
@@ -89,7 +89,7 @@ export default function Home({userToken}) {
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
                 <Tab.Screen name={creategroup} options={{headerShown:false}} component={CreateGroup}/>
                 <Tab.Screen name={contacts} options={{headerShown:false}}>{() => <Contacts userinfo={userinfo} />}</Tab.Screen>
-                <Tab.Screen name={profilePage} options={{headerShown:false}}>{() => <ProfilePage userinfo={userinfo} />}</Tab.Screen>                
+                <Tab.Screen name={profile} options={{headerShown:false}}>{() => <ProfilePage userinfo={userinfo} />}</Tab.Screen>                
           </Tab.Navigator>
   )
 }

@@ -16,7 +16,6 @@ import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firesto
 import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import COLORS from '../consts/colors';
-import {firebase} from '../config';
 
 const width = Dimensions.get('window').width / 2 - 30;
 
@@ -31,24 +30,30 @@ const [likedGroups, setLikedGroups] = useState([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [filteredGroups, setFilteredGroups] = useState(groups);
     
-  useEffect(() => {
-    const fetchData = async () => {
-      if (userinfo && userinfo.groups) {
-        const docRef = doc(db, 'users', userinfo.userId);
-        const groups = await (await getDoc(docRef)).data().groups;
-        console.log(groups);
-        if (groups) {
-          let q = query(todoRef, where('Groupid', 'in', groups));
-          let rtrgroups = [];
-          const querySnapshot = await getDocs(q);
-          querySnapshot.forEach((doc) => {
-            rtrgroups.push(doc.data());
-          });
-          setGroups(rtrgroups);
+  const fetchData = async () => {
+    if (userinfo && userinfo.groups) {
+      const docRef = doc(db, 'users', userinfo.userId);
+      const groups = await (await getDoc(docRef)).data().groups;
+      console.log(groups);
+      if (groups) {
+        let q = query(todoRef, where('Groupid', 'in', groups));
+        let rtrgroups = [];
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          rtrgroups.push(doc.data());
+        });
+        if(groups != rtrgroups){
+        setGroups(rtrgroups);
         }
       }
-    };
-    fetchData();
+    }
+  };
+
+  useEffect(() => {
+    navigation.addListener('focus', (e) => {
+      fetchData()
+    });
+    fetchData()
   }, [userinfo]);
 
     

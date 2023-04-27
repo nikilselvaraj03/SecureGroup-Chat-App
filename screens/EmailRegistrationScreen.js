@@ -88,7 +88,7 @@ export default function EmailRegistrationScreen() {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" />
             <View style={styles.signupTitleContainer}><Text style={styles.signupTitle}>Signup for TopDeck</Text></View>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.inputContainer}>
+            <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' } style={styles.inputContainer}>
                 <View>
                     <Text style={styles.inputTitle}>E-MAIL ADDRESS</Text>
                     <TextInput value={email} autoCapitalize="none" onChangeText={(email) => { setEmail(email); }} style={styles.emailInput}></TextInput>

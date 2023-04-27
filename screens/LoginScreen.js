@@ -1,10 +1,11 @@
-import {ActivityIndicator,TouchableWithoutFeedback, Keyboard, Image,StatusBar,Platform, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
+import {TouchableWithoutFeedback, Keyboard, Image,StatusBar,Platform, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react';
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import {ActivityIndicator} from 'react-native-paper';
 import Home from './Home';
 const LoginScreen = ({ route, navigationParam }) => {
 
@@ -81,10 +82,10 @@ const LoginScreen = ({ route, navigationParam }) => {
      <Home userToken={auth.currentUser} /> :
       (<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.loginContainer}>
-         <StatusBar barStyle="light-content" /> 
+         <StatusBar barStyle= { Platform.OS == 'ios' ?  "light-content" : 'dark-content'}/> 
           <View style={styles.selfAuthContainer}>
             <Text style={styles.title}>Welcome!</Text>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
           <TextInput placeholder='Email'  autoCapitalize="none" blurOnSubmit={true} onSubmitEditing={()=>validate(false)} value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
           <TextInput placeholder='Password' value={password} onChangeText={password => setPassword(password)} secureTextEntry style={styles.inputContainer} placeholderTextColor="#fff"/>
           { (
@@ -152,7 +153,7 @@ const LoginScreen = ({ route, navigationParam }) => {
             flexDirection:'row',
             justifyContent:'space-around',
             alignItems:'center',
-            zIndex:10
+            zIndex:0
         },
         inputContainer:{
             minWidth:300,

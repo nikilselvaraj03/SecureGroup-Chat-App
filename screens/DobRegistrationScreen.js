@@ -58,7 +58,7 @@ function formatDate(date) {
     <View style={styles.container}>
       <View style={styles.titleContainer}>
       <Text style={styles.title}>Enter your date of birth!</Text></View>
-      <KeyboardAvoidingView style={styles.inputContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView style={styles.inputContainer} behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
       <View style={styles.datePickerStyle}>
       <View style={styles.dateContainer}>
       <Text style={styles.dateFormat} onPress={()=>{setShowDatePicker(!showDatePicker)}}>{formatDate(new Date(date_of_birth))}

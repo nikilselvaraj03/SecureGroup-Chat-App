@@ -1,7 +1,7 @@
 import { KeyboardAvoidingView,Image,Platform, StyleSheet,StatusBar, Text, TouchableOpacity, View, Dimensions, Keyboard } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { TextInput } from 'react-native-gesture-handler'
-import BouncingBalls from 'react-native-bouncing-ball'
+import BouncingBall from './BouncingBall'
 export default function NameRegistrationScreen({route,navigation}) {
   const [first_name,setfirst_name] = useState('');
   const [last_name,setlast_name] = useState('');
@@ -43,7 +43,7 @@ useEffect(()=>{
 
   return (
     <View style={styles.container}>
-      <BouncingBalls
+      <BouncingBall
           amount={4}
           animationDuration={5000}
           minSpeed={30}
@@ -60,7 +60,7 @@ useEffect(()=>{
       <View style={styles.titleContainer}>
       <Text style={styles.title}>What's your name?</Text>
       </View>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.nameContainer}>
+      <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' } style={styles.nameContainer}>
       <Text style={styles.inputTitle}>FIRST NAME</Text>
       <TextInput style={styles.input} onChangeText={(firstName)=>{setfirst_name(firstName);}} maxLength={20} autoFocus={true}></TextInput>
       <Text style={styles.inputTitle}>LAST NAME</Text>
