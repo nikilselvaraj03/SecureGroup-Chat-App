@@ -166,11 +166,12 @@ const GroupProfileScreen = ({ route, navigation }) => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Icon name="chevron-back-outline" size={26} color="#673AB7" />
+            <Icon name="chevron-back-outline" size={22} color="#424242" />
             <Text
               style={{
-                fontSize: 20,
-                color: "#673AB7",
+                fontSize: 18,
+                fontWeight:300,
+                color: "#424242",
               }}
             >
               Back
@@ -189,7 +190,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
               fontSize: 26,
               fontWeight: "500",
 
-              color: "#673AB7",
+              color: "#616161",
             }}
           >
             {groupName}
@@ -201,10 +202,10 @@ const GroupProfileScreen = ({ route, navigation }) => {
               fontSize: 15,
               fontWeight: "300",
 
-              color: "#673AB7",
+              color: "#424242",
             }}
           >
-            {participantsData.length}
+            {participantsData.length} members
           </Text>
         </View>
         <View style={styles.multiselect}>
@@ -384,12 +385,11 @@ const styles = StyleSheet.create({
    justifyContent: "center",
    alignItems: "center",
    alignSelf:'center',
-   marginVertical:30
+   marginBottom:30,
+   marginTop:10
  }
 ,
   multiselect: {
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 14,
+    margin:30,
   },
 });

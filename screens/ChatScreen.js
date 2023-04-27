@@ -117,7 +117,7 @@ const userInfromation = async () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"} // set behavior prop to "padding"
       >
         <SafeAreaView style={styles.safeArea}>
-          <StatusBar backgroundColor="black" />
+          <StatusBar backgroundColor="#616161" translucent={false}  />
           <View style={styles.header}>
             {/* Your header content */}
             <TouchableOpacity
@@ -126,13 +126,14 @@ const userInfromation = async () => {
             >
               <Icon
                 name="chevron-back-outline"
-                size={26}
-                color="#673AB7"
+                size={20}
+                color="#616161"
               ></Icon>
               <Text
                 style={{
-                  fontSize: 20,
-                  color: "#673AB7",
+                  fontSize: 18,
+                  color: "#616161",
+                  fontWeight:'300'
                 }}
               >
                 Back
@@ -141,9 +142,9 @@ const userInfromation = async () => {
             <View>
               <Text
                 style={{
-                  fontSize: 19,
-                  fontWeight: 500,
-                  color: "#673AB7",
+                  fontSize: 18,
+                  fontWeight: 300,
+                  color: "#616161",
                   marginRight: "10%",
                 }}
               >
@@ -153,8 +154,8 @@ const userInfromation = async () => {
             <TouchableOpacity>
               <Icon
                 name="information-circle-outline"
-                size={26}
-                color="#673AB7"
+                size={24}
+                color="#616161"
                 onPress={() => navigation.navigate('GroupProfileScreen', { groupId:groupId, groupName:groupName})
                 }
               ></Icon>
@@ -227,15 +228,17 @@ const userInfromation = async () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#d3d3d3",
+    backgroundColor: "#ffffff",
   },
   header: {
     height: 50,
-    backgroundColor: "#d3d3d3",
+    backgroundColor: "#ffffff",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
+    borderBottomWidth:StyleSheet.hairlineWidth,
+    borderBottomColor:'#616161'
   },
   body: {
     flex: 1,
