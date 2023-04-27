@@ -91,6 +91,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
       console.log("doc data", groupinfo);
 
       const participantIds = groupData.participants;
+
       const participantDataPromises = participantIds.map(
         async (participantId) => {
           const userRef = doc(db, "users", participantId);
@@ -203,7 +204,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
               color: "#673AB7",
             }}
           >
-            4 Members
+            {participantsData.length}
           </Text>
         </View>
         <View style={styles.multiselect}>
@@ -231,7 +232,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
               style={{
                 fontSize: 18,
                 color: "white",
-                fontFamily: "Times New Roman",
+               
               }}
             >
               Add Participants
@@ -274,7 +275,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
               style={{
                 fontSize: 18,
                 color: "white",
-                fontFamily: "Times New Roman",
+               
               }}
               onPress={handleDeleteGroup}
             >

@@ -42,7 +42,7 @@ const LandingScreen = ({ navigationParam, userinfo }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [filteredGroups, setFilteredGroups] = useState(groups);
-  const [delgrp, setDelgrp] = useState();
+  // const [delgrp, setDelgrp] = useState();
   const LandingScreenValue = () => {
     return (
       <SafeAreaView
@@ -125,13 +125,7 @@ const LandingScreen = ({ navigationParam, userinfo }) => {
         const groupData = groupSnap.data();
         console.log("see group data here", groupData.selectedDate);
         console.log("see current date here", currentDate);
-        const groupDate = formatDate(groupData.selectedDate);
-        if (
-          typeof groupDate === "string" &&
-          typeof currentDate === "string" &&
-          groupDate === currentDate
-        ) {
-          console.log("Date", formatDate(groupData.selectedDate));
+        if (formatDate(groupData.selectedDate) === currentDate) {
           await deleteDoc(doc(db, "Groups", groupId));
           console.log("group deleted");
         }
@@ -143,7 +137,7 @@ const LandingScreen = ({ navigationParam, userinfo }) => {
       const year = dateObj.getFullYear();
       const month = String(dateObj.getMonth() + 1).padStart(2, "0");
       const day = String(dateObj.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+      return `${day}/${month}/${year}`;
     };
 
     async function fetchData() {
@@ -162,7 +156,7 @@ const LandingScreen = ({ navigationParam, userinfo }) => {
     }
 
     fetchData();
-    getGroupInfo();
+    // getGroupInfo();
     // deleteGroup();
   }, [userinfo]);
 

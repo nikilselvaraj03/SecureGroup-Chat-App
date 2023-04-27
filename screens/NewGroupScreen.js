@@ -101,7 +101,7 @@ const NewGroupScreen = ({ userToken }) => {
       Admin: auth.currentUser.uid,
       Name: addData,
       // groupImage: "",
-      participants: auth.currentUser.uid,
+      participants: [auth.currentUser.uid],
       isDisappearingGroup,
       // admin: Auth.currentuser.uid,
       selectedDate: isDisappearingGroup ? selectedDate : null,
