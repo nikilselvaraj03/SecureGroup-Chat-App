@@ -86,6 +86,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
     const docRef = doc(db, "Groups", groupId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
+      
       const groupData = docSnap.data();
       setGroupinfo(groupData);
       console.log("doc data", groupinfo);
@@ -170,7 +171,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
             <Text
               style={{
                 fontSize: 18,
-                fontWeight:300,
+                fontWeight:400,
                 color: "#424242",
               }}
             >
@@ -179,16 +180,16 @@ const GroupProfileScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.imageContainer}>
-          {/* <Image
-            source={require("../assets/images/profileImage2.jpg")}
+          <Image
+            source={groupinfo && groupinfo.groupPhotoUrl ? {uri: groupinfo.groupPhotoUrl } : require("../assets/images/output.png")}
             style={styles.icon}
-          /> */}
+          />
           <Text
             style={{
               marginTop: "3%",
               textAlign: "center",
               fontSize: 26,
-              fontWeight: "500",
+              fontWeight: "400",
 
               color: "#616161",
             }}
@@ -200,7 +201,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
               marginTop: "1%",
               textAlign: "center",
               fontSize: 15,
-              fontWeight: "300",
+              fontWeight: "400",
 
               color: "#424242",
             }}
@@ -322,9 +323,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {
-    width: 110,
-    height: 110,
+    width: 130,
+    height: 130,
     borderRadius: 75,
+    backgroundColor:'#e0e0e0',
+    justifyContent:'center',
+    alignItems:'center',
+    padding:10,
+    marginBottom:10
   },
   imageContainer: {
     marginLeft: "auto",

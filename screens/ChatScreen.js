@@ -133,7 +133,7 @@ const userInfromation = async () => {
                 style={{
                   fontSize: 18,
                   color: "#616161",
-                  fontWeight:'300'
+                  fontWeight:'400'
                 }}
               >
                 Back
@@ -143,7 +143,7 @@ const userInfromation = async () => {
               <Text
                 style={{
                   fontSize: 18,
-                  fontWeight: 300,
+                  fontWeight: 400,
                   color: "#616161",
                   marginRight: "10%",
                 }}

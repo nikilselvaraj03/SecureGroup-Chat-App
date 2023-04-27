@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
 import { auth, db } from "../firebase";
-import * as firebase from "../firebase";
-
+import * as ImagePicker from 'expo-image-picker';
+import { groupProfileRef } from '../firebase';
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 import {
@@ -17,6 +19,7 @@ import {
   query,
   where,
   getDocs,
+  Query,
 } from "firebase/firestore";
 import uuid from "uuid";
 import { Firestore } from "firebase/app";
@@ -43,13 +46,109 @@ import { useNavigation } from "@react-navigation/native";
 const NewGroupScreen = ({ userToken }) => {
   let navigation = useNavigation();
   // const [groupName, setGroupName] = useState("");
-  const [groupImage, setGroupImage] = useState(null);
+  const [image, setImage] = useState(null);
+  const [imageMetaData, setImageMetaData] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [hasGalleryPermission, setHasGalleryPermission] = useState (null);
+  const [profilePhotoURL, setProfilePhotoURL] =  useState('');
   const [isDisappearingGroup, setIsDisappearingGroup] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [addData, setAddData] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
   // const [participants, setParticipants] = useState([]);
 
+
+  useEffect (() => {
+    (async () => {
+    const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    setHasGalleryPermission(galleryStatus.status ===
+    'granted');
+    })();
+  },[])
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0,
+    });
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      setImageMetaData(result.assets[0])
+      uploadImage()
+    }
+  };
+
+
+
+const uniqueName = () => {
+  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+  return uuid;
+}
+
+  function generateUniqueFileName(filename) {
+    // Get the file extension.
+    const extension = filename.split('.')[1];
+  
+    // Generate a UUID.
+    const uuid = uniqueName();
+  
+    // Return the file name with the UUID and extension.
+    return `${uuid}.${extension}`;
+  }
+
+  const uploadImage = async () => {
+    if(profilePhotoURL) {
+      // await deleteObject(profilePhotoURL)
+    }
+    if (!image) {
+      return;
+    } 
+    const img = await fetch(image)
+    const bytes = await img.blob();
+    setUploading(true);
+    const uploadTask = uploadBytesResumable(ref(groupProfileRef,generateUniqueFileName(imageMetaData.fileName)), bytes);
+
+    // Register three observers:
+    // 1. 'state_changed' observer, called any time the state changes
+    // 2. Error observer, called on failure
+    // 3. Completion observer, called on successful completion
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case 'paused':
+            console.log('Upload is paused');
+            break;
+          case 'running':
+            console.log('Upload is running');
+            break;
+        }
+      }, 
+      (error) => {
+        setUploading(false)
+        console.log(error)
+      }, 
+      () => {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log('File available at', downloadURL);
+          setProfilePhotoURL(downloadURL)
+        });
+        setUploading(false)
+      }
+    );
+    
+  };
   // const [userData, setUserData] = useState(null);
   // const [docId, setDocId] = useState("");
   const [userDocs, setUserDocs] = useState([]);
@@ -58,27 +157,12 @@ const NewGroupScreen = ({ userToken }) => {
     setSelectedDate(newDate);
   };
 
-  //
-
-  const handleImagePicker = () => {
-    launchImageLibrary(
-      {
-        mediaType: "photo",
-        selectionLimit: 1,
-      },
-      (response) => {
-        if (!response.didCancel && !response.error) {
-          setGroupImage(response.uri);
-        }
-      }
-    );
-  };
-
+  
   const deleteDocsByDate = async (collectionName, date) => {
     try {
-      const collectionRef = db.collection(collectionName);
-      const query = collectionRef.where("selectedDate", "==", date);
-      const snapshot = await query.get();
+      const collectionRef = collection(db,collectionName);
+      const query = Query(collectionRef,where("selectedDate", "==", date));
+      const snapshot = await getDocs(query);
       snapshot.forEach((doc) => {
         doc.ref.delete();
       });
@@ -103,6 +187,7 @@ const NewGroupScreen = ({ userToken }) => {
       isDisappearingGroup,
       // admin: Auth.currentuser.uid,
       selectedDate: isDisappearingGroup ? selectedDate : null,
+      groupPhotoUrl:profilePhotoURL
     }).then(() => {
       console.log("Group created");
       setAddData("");
@@ -206,10 +291,11 @@ const NewGroupScreen = ({ userToken }) => {
           <View style={styles.container}>
             <TouchableOpacity
               style={styles.groupImageContainer}
-              onPress={handleImagePicker}
+              onPress={()=> {pickImage()}}
             >
-              {groupImage ? (
-                <Image style={styles.groupImage} source={{ uri: groupImage }} />
+              
+              {profilePhotoURL ? (
+                <Image style={styles.groupImage} source={{ uri: profilePhotoURL }} />
               ) : (
                 <>
                   <Icon name="image-outline" size={40} color="#919191" />

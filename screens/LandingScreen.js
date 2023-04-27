@@ -67,7 +67,7 @@ const [likedGroups, setLikedGroups] = useState([]);
       numColumns={2}
       data={searchQuery ? filteredGroups : groups}
       renderItem={({item}) => {
-        return <Card groups={item.Name} groupid={item.Groupid} userinfo={userinfo.groups} />;
+        return <Card groups={item.Name} groupid={item.Groupid} groupInfo={item} userinfo={userinfo.groups} />;
       }}
 
     /> ): (<></>)
@@ -133,11 +133,11 @@ const [likedGroups, setLikedGroups] = useState([]);
 
   let random = generateRandomNumber();
 
-  const Card = ({groups, groupid, userinfo}) => {
+  const Card = ({groups, groupid,groupInfo, userinfo}) => {
     const isLiked = likedGroups.findIndex((likedGroup) => likedGroup.id === groupid) !== -1;
     return (
       <TouchableOpacity style={{ padding:10}} activeOpacity={0.8} onPress={() => {
-        navigation.navigate('ChatScreen', { groupId: groups, groupName: groups});
+        navigation.navigate('ChatScreen', { groupId: groupid, groupName: groups});
       }}>
         <StatusBar barStyle="dark-content" />
         <View style={style.card}>
@@ -152,9 +152,9 @@ const [likedGroups, setLikedGroups] = useState([]);
               height:118,
               alignItems: 'center',
             }}>
-            <Image
-              source={require('../assets/images/output.png')}
-              style={{flex: 1, resizeMode: 'contain'}}
+            <Image 
+              source={ groupInfo && groupInfo.groupPhotoUrl ? {uri: groupInfo.groupPhotoUrl } : require('../assets/images/output.png')}
+              style={{ width:100,height:100, borderRadius:60,borderWidth: groupInfo.groupPhotoUrl ? 3 : 0, borderColor:'#ffffff'}}
             />
           </View>
 
