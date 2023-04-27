@@ -9,7 +9,7 @@ import Contacts from './Contacts';
 import CreateGroup from './CreateGroup';
 import LandingScreen from './LandingScreen';
 import ProfilePage from './ProfilePage';
-
+import NewGroupScreen from './NewGroupScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -18,7 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const home = 'Home';
 const profile = 'Profile';
 const contacts = 'Requests';
-const creategroup = 'CreateGroup';
+const creategroup = 'Create New Group';
 
 const Tab = createBottomTabNavigator();
 
@@ -87,7 +87,7 @@ export default function Home({userToken}) {
             >
                 <Tab.Screen name={home} options={{headerShown:false}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
-                <Tab.Screen name={creategroup} options={{headerShown:false}} component={CreateGroup}/>
+                <Tab.Screen name={creategroup} options={{headerShown:true}} component={NewGroupScreen}/>
                 <Tab.Screen name={contacts} options={{headerShown:false}}>{() => <Contacts userinfo={userinfo} />}</Tab.Screen>
                 <Tab.Screen name={profile} options={{headerShown:false}}>{() => <ProfilePage userinfo={userinfo} />}</Tab.Screen>                
           </Tab.Navigator>

@@ -84,6 +84,11 @@ const Contacts = ({ userinfo }) => {
           await updateDoc(userDocRef, {
             groups: arrayUnion(groupid),
             requests:arrayRemove(groupid)
+        }).then(async ()=>{
+          const groupRef = doc(db, "Groups", groupid);
+          await updateDoc(groupRef,{
+            participants:arrayUnion(userinfo.userId)
+          })
         })
         
         

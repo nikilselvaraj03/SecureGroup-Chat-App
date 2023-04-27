@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import ChatScreen from "./ChatScreen";
+import GroupProfileScreen from "./GroupProfileScreen";
 import {
   View,
   SafeAreaView,
@@ -15,8 +17,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-root-toast';
 import COLORS from '../consts/colors';
-
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
 const width = Dimensions.get('window').width / 2 - 30;
 
 const LandingScreen = ({ navigation, userinfo }) => {
@@ -29,13 +33,55 @@ const [likedGroups, setLikedGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [filteredGroups, setFilteredGroups] = useState(groups);
-    
+
+  const isEmptyGroups= () =>{
+    return !(groups && groups.length > 0) || (filteredGroups && filteredGroups.length)
+  }
+  const LandingScreenValue =() => {return (<SafeAreaView
+    style={{flex: 1, paddingHorizontal: 20, backgroundColor: COLORS.white}}>
+    <View style={style.header}>
+      <View>
+        <Text style={{fontSize:25, color: '#673AB7', justifyContent:'center', fontWeight: 'bold', paddingLeft: 10}}>
+          TOPDECK
+        </Text>
+      </View>
+    </View>
+    <View style={{marginTop: 30, flexDirection: 'row',paddingHorizontal:20}}>
+      <View style={style.searchContainer}>
+        <Icon name="search" size={25} style={{marginLeft: 20}} />
+        <TextInput placeholder="Search" style={style.input} value={searchQuery}  onChangeText={(text)=>{handleSearch(text)}}/>
+      </View>
+      <View style={style.sortBtn}>
+        <Icon name="sort" size={30} color='white'/>
+      </View>
+    </View>
+    {
+   !isEmptyGroups() ?
+    (<FlatList
+      columnWrapperStyle={{justifyContent: 'space-between'}}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        marginTop: 10,
+        paddingBottom: 50,
+      }}
+      numColumns={2}
+      data={searchQuery ? filteredGroups : groups}
+      renderItem={({item}) => {
+        return <Card groups={item.Name} groupid={item.Groupid} userinfo={userinfo.groups} />;
+      }}
+
+    /> ): (<></>)
+    }
+    {isEmptyGroups() ? <View style={{flex:1, alignItems:'center', justifyContent:'center'}}> 
+        <Image source={require("../assets/images/uhoh.png")} style={{height:130,width:180}}/><Text style={{fontFamily:'Caveat-Bold', textAlign:'center', fontSize:24,letterSpacing:1.1, color:'grey'}}>{"\n\n"}Seems like you are'nt in any groups{"\n\n"} Go ahead and create one.</Text>
+        </View>:<></>}
+  </SafeAreaView>)}
   const fetchData = async () => {
     if (userinfo && userinfo.groups) {
       const docRef = doc(db, 'users', userinfo.userId);
       const groups = await (await getDoc(docRef)).data().groups;
       console.log(groups);
-      if (groups) {
+      if (groups && groups.length > 0) {
         let q = query(todoRef, where('Groupid', 'in', groups));
         let rtrgroups = [];
         const querySnapshot = await getDocs(q);
@@ -90,7 +136,9 @@ const [likedGroups, setLikedGroups] = useState([]);
   const Card = ({groups, groupid, userinfo}) => {
     const isLiked = likedGroups.findIndex((likedGroup) => likedGroup.id === groupid) !== -1;
     return (
-      <TouchableOpacity style={{ padding:10}} activeOpacity={0.8}>
+      <TouchableOpacity style={{ padding:10}} activeOpacity={0.8} onPress={() => {
+        navigation.navigate('ChatScreen', { groupId: groups, groupName: groups});
+      }}>
         <StatusBar barStyle="dark-content" />
         <View style={style.card}>
           <View style={{alignItems: 'flex-end'}}>
@@ -161,39 +209,11 @@ const [likedGroups, setLikedGroups] = useState([]);
   };
 
   return (
-    <SafeAreaView
-      style={{flex: 1, paddingHorizontal: 20, backgroundColor: COLORS.white}}>
-      <View style={style.header}>
-        <View>
-          <Text style={{fontSize:25, color: '#673AB7', justifyContent:'center', fontWeight: 'bold', paddingLeft: 10}}>
-            TOPDECK
-          </Text>
-        </View>
-      </View>
-      <View style={{marginTop: 30, flexDirection: 'row',paddingHorizontal:20}}>
-        <View style={style.searchContainer}>
-          <Icon name="search" size={25} style={{marginLeft: 20}} />
-          <TextInput placeholder="Search" style={style.input} value={searchQuery}  onChangeText={(text)=>{handleSearch(text)}}/>
-        </View>
-        <View style={style.sortBtn}>
-          <Icon name="sort" size={30} color='white'/>
-        </View>
-      </View>
-      <FlatList
-        columnWrapperStyle={{justifyContent: 'space-between'}}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          marginTop: 10,
-          paddingBottom: 50,
-        }}
-        numColumns={2}
-        data={searchQuery ? filteredGroups : groups}
-        renderItem={({item}) => {
-          return <Card groups={item.Name} groupid={item.Groupid} userinfo={userinfo.groups} />;
-        }}
-
-      />
-    </SafeAreaView>
+    <Stack.Navigator> 
+    <Stack.Screen  options={{headerShown:false}} name="Landing" component={LandingScreenValue} />
+      <Stack.Screen options={{headerShown:false}}  name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen   options={{headerShown:false}} name="GroupProfileScreen" component={GroupProfileScreen}/>
+    </Stack.Navigator>
   );
 };
 
