@@ -186,7 +186,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
             style={{
               marginTop: "3%",
               textAlign: "center",
-              fontSize: 26,
+              fontSize: 28,
               fontWeight: "500",
 
               color: "#673AB7",
@@ -199,12 +199,12 @@ const GroupProfileScreen = ({ route, navigation }) => {
               marginTop: "1%",
               textAlign: "center",
               fontSize: 15,
-              fontWeight: "300",
+              fontWeight: "350",
 
               color: "#673AB7",
             }}
           >
-            {participantsData.length}
+            {participantsData.length} Members
           </Text>
         </View>
         <View style={styles.multiselect}>
@@ -249,7 +249,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
             color: "black",
           }}
         >
-          Participants:
+          Participants: 
         </Text>
         <View style={styles.detailsContainer}>
           {participantsData.map((item) => {

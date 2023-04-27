@@ -112,9 +112,12 @@ const NewGroupScreen = ({ userToken }) => {
     });
     let recors = selectedItems;
     recors.forEach((element) => {
-      const docRefer = updateDoc(doc(db, "users", element), {
-        requests: arrayUnion(uniqueId),
-      });
+      if (element !== auth.currentUser.uid) {
+        // Check if element is not equal to logged in user ID
+        const docRefer = updateDoc(doc(db, "users", element), {
+          requests: arrayUnion(uniqueId),
+        });
+      }
     });
     const cuser = auth.currentUser.uid;
     const docRefer1 = updateDoc(doc(db, "users", cuser), {
