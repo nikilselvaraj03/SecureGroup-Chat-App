@@ -166,8 +166,41 @@ const userInfromation = async () => {
             <ScrollView
               style={styles.messagesContainer}
               keyboardShouldPersistTaps="handled"
-            >
-              {messages.message &&
+            >{messages.message &&
+  messages.message.map((item) => {
+    return (
+      <React.Fragment key={item.message_id}>
+        {item.user_id != auth.currentUser.uid ? (
+          <Text
+            style={{
+              fontSize: 15,
+              color: "purple",
+              paddingBottom: 1,
+            }}
+          >
+            <Text>
+              {item.first_name.charAt(0).toUpperCase()}
+              {item.last_name.charAt(0).toUpperCase()}
+            </Text>
+          </Text>
+        ) : (
+          null
+        )}
+        <View
+          style={[
+            styles.message,
+            item.user_id == auth.currentUser.uid
+              ? styles.myMessage
+              : styles.otherUserMessage,
+          ]}
+        >
+          <Text style={styles.messageBody}>{item.message_text}</Text>
+        </View>
+      </React.Fragment>
+    );
+  })}
+
+              {/* {messages.message &&
                 messages.message.map((item) => {
                   return (
                     <>
@@ -202,7 +235,7 @@ const userInfromation = async () => {
                       </View>
                     </>
                   );
-                })}
+                })} */}
             </ScrollView>
 
             <View style={styles.inputContainer}>
