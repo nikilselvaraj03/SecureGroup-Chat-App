@@ -156,7 +156,7 @@ const Contacts = ({ userinfo }) => {
               }}
       
             /> : <View style={{flex:1, alignItems:'center', justifyContent:'center'}}> 
-            <Text style={{fontFamily:'Caveat', textAlign:'center', fontSize:26,letterSpacing:1, color:'grey'}}>No new requests at this moment</Text></View>}</View>
+            <Text style={{textAlign:'center', fontSize:16,letterSpacing:1, color:'grey'}}>No new requests at this moment</Text></View>}</View>
           </SafeAreaView>
         );
       };

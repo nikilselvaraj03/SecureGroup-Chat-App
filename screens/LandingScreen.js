@@ -73,7 +73,7 @@ const [likedGroups, setLikedGroups] = useState([]);
     /> ): (<></>)
     }
     {isEmptyGroups() && !isLoading ? <View style={{flex:1, alignItems:'center', justifyContent:'center'}}> 
-        <Image source={require("../assets/images/uhoh.png")} style={{height:130,width:180}}/><Text style={{fontFamily:'Caveat', textAlign:'center', fontSize:24,letterSpacing:1.1, color:'grey'}}>{"\n\n"}Seems like you are'nt in any groups{"\n\n"} Go ahead and create one.</Text>
+        <Text style={{ textAlign:'center', fontSize:16,letterSpacing:1.0, color:'grey', paddingBottom:20}}>Seems like you are'nt in any groups.{"\n\n"} Go ahead and create one</Text>
         </View>:<></>}
   </SafeAreaView>)}
   const fetchData = async () => {
