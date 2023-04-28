@@ -26,9 +26,6 @@ const width = Dimensions.get('window').width / 2 - 30;
 const Contacts = ({ userinfo }) => {
     navigation = useNavigation()
     const [groups, setGroups] = useState([]);
-    const [likedGroups, setLikedGroups] = useState([]);
-    const [searchQuery, setSearchQuery] = useState(''); 
-    const [filteredGroups, setFilteredGroups] = useState(groups);
     const todoRef = collection(db,'Groups');
     
     useEffect(() => {
@@ -145,6 +142,7 @@ const Contacts = ({ userinfo }) => {
 
             </View>
             <View style={style.cards}>
+            { groups && groups.length > 0?
             <FlatList
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
@@ -152,12 +150,13 @@ const Contacts = ({ userinfo }) => {
               }}
               
               numColumns={1}
-              data={searchQuery ? filteredGroups : groups}
+              data={groups}
               renderItem={({item}) => {
                 return <Card groups={item.Name} groupid={item.Groupid} userinfo={userinfo.requests}  />;
               }}
       
-            /></View>
+            /> : <View style={{flex:1, alignItems:'center', justifyContent:'center'}}> 
+            <Text style={{fontFamily:'Caveat', textAlign:'center', fontSize:26,letterSpacing:1, color:'grey'}}>No new requests at this moment</Text></View>}</View>
           </SafeAreaView>
         );
       };
