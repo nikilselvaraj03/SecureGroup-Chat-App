@@ -313,22 +313,33 @@ const uniqueName = () => {
             />
 
             <MultiSelect
+            hideTags
               items={userDocs}
               uniqueKey="userId"
               onSelectedItemsChange={setSelectedItems}
               selectedItems={selectedItems}
               selectText="Search participants to add"
               searchInputPlaceholderText="Search options..."
-              searchInputStyle={{ borderRadius: 5 }}
-              tagRemoveIconColor="#d3d3d3"
-              tagBorderColor="#d3d3d3"
-              tagTextColor="#d3d3d3"
-              selectedItemTextColor="#d3d3d3"
-              selectedItemIconColor="#d3d3d3"
-              itemTextColor="black"
+              searchInputStyle={{ borderRadius: 5 , height:60}}
+              tagRemoveIconColor="#616161"
+              tagBorderColor="#616161"
+              tagTextColor="#616161"
+              selectedItemTextColor="#616161"
+              selectedItemIconColor="#616161"
+              itemTextColor="grey"
               displayKey="first_name"
-              hideSubmitButton={true}
+              hideSubmitButton={false}
             />
+
+       {!isDisappearingGroup &&  <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{maxHeight:65,marginTop:5}}>
+                {selectedItems.map((item) => (
+                  (<View key={item} style={{paddingVertical:10,paddingHorizontal:15, borderWidth:1, borderColor:'#616161', marginRight:15, borderRadius:20, maxHeight:40, alignItems:'center',display:'flex', justifyContent:'center'}}>
+                  <Text  style={{ fontSize:16, color:'#616161' }}>
+                    {userDocs.find((option) => option.userId === item).first_name}
+                  </Text></View>)
+                ))}
+          </ScrollView>}
+
 
             <View style={styles.disapper}>
               <Text style={styles.label}>Disappearing Group</Text>
@@ -379,7 +390,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
-    marginBottom: 15,
+    marginBottom: 20,
     alignItems: "center",
   },
   backButton: {
@@ -397,7 +408,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 10,
   },
   groupImageContainer: {
     width: 100,
@@ -445,7 +456,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   rnd: {
-    marginBottom: 20,
+    marginBottom: 10,
     marginRight: "auto",
     marginLeft: "auto",
   },

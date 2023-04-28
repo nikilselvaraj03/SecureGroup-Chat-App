@@ -37,6 +37,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
   const [groupinfo, setGroupinfo] = useState({});
   const [participant, setParticipant] = useState([]);
   const [userDocs, setUserDocs] = useState([]);
+  const [showTags,setShowTags] = useState(true)
   // const [groupinfo, setGroupinfo] = useState({});
   const [participantsData, setParticipantsData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -72,8 +73,8 @@ const GroupProfileScreen = ({ route, navigation }) => {
 
     const chatDocRef = doc(db, "Groups", groupId);
     data.forEach((element) => {
-      updateDoc(chatDocRef, {
-        participants: arrayUnion(element),
+      const docRefer = updateDoc(doc(db, "users", element), {
+        requests: arrayUnion(groupId),
       }).then(async () => {
         console.log("data updated");
         await getGroupInfo();
@@ -210,6 +211,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.multiselect}>
           <MultiSelect
+          hideTags
             items={userDocs}
             uniqueKey="userId"
             onSelectedItemsChange={setSelectedItems}
@@ -220,12 +222,21 @@ const GroupProfileScreen = ({ route, navigation }) => {
             tagRemoveIconColor="black"
             tagBorderColor="black"
             tagTextColor="black"
-            selectedItemTextColor="black"
-            selectedItemIconColor="black"
-            itemTextColor="black"
+            selectedItemTextColor="#616161"
+            selectedItemIconColor="#616161"
+            itemTextColor="grey"
             displayKey="first_name"
-            hideSubmitButton={true}
+            hideSubmitButton={false}
+            onToggleList = {()=>{setShowTags(!showTags)}}
           />
+          {showTags &&  <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{maxHeight:65,marginTop:5}}>
+                {selectedItems.map((item) => (
+                  (<View key={item} style={{paddingVertical:10,paddingHorizontal:15, borderWidth:1, borderColor:'#616161', marginRight:15, borderRadius:20, maxHeight:40, alignItems:'center',display:'flex', justifyContent:'center'}}>
+                  <Text  style={{ fontSize:16, color:'#616161' }}>
+                    {userDocs.find((option) => option.userId === item).first_name}
+                  </Text></View>)
+                ))}
+          </ScrollView>}
         </View>
         <View style={styles.shareGroup}>
           <TouchableOpacity onPress={addParticipants}>
@@ -255,8 +266,8 @@ const GroupProfileScreen = ({ route, navigation }) => {
         <View style={styles.detailsContainer}>
           {participantsData.map((item) => {
             return (
-              <View style={styles.details}>
-                <Text key={item.userId} style={styles.Nametext}>
+              <View key={item.userId} style={styles.details}>
+                <Text  style={styles.Nametext}>
                   {item.first_name} {item.last_name}
                   {/* <Text style={{color: "purple", fontSize: 15, fontWeight: 300}}>Email: {item.email}</Text> */}
                 </Text>
