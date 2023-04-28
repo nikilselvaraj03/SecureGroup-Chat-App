@@ -8,6 +8,7 @@ import { RootSiblingParent } from 'react-native-root-siblings';
 import PasswordReset from './screens/PasswordReset';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { StatusBar } from 'expo-status-bar';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -16,7 +17,7 @@ export default function App() {
       await SplashScreen.preventAutoHideAsync();
       setTimeout(() => {
         SplashScreen.hideAsync();
-      }, 2500);
+      }, 1700);
     };
   
     hideSplashScreen();
@@ -31,6 +32,7 @@ export default function App() {
   }
   return (
     <RootSiblingParent>
+      <StatusBar translucent={true} style="light"></StatusBar>
     <NavigationContainer>
     <Stack.Navigator>
       {(

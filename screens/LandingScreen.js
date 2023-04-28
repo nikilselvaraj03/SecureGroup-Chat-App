@@ -58,7 +58,7 @@ const [likedGroups, setLikedGroups] = useState([]);
     {
    !isEmptyGroups() ?
     (<FlatList
-      columnWrapperStyle={{justifyContent: 'space-between'}}
+      columnWrapperStyle={{justifyContent: 'space-around'}}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         marginTop: 10,
@@ -161,7 +161,7 @@ const [likedGroups, setLikedGroups] = useState([]);
       <TouchableOpacity style={{ padding:10}} activeOpacity={0.8} onPress={() => {
         navigation.navigate('ChatScreen', { groupId: groupid, groupName: groups});
       }}>
-        <StatusBar barStyle="dark-content" />
+        <StatusBar translucent={false} barStyle="dark-content"></StatusBar>
         <View style={style.card}>
           <View style={{alignItems: 'flex-end'}}>
            <TouchableOpacity onPress={() => {}}>
@@ -264,7 +264,7 @@ const style = StyleSheet.create({
   card: {
     height: 225,
     backgroundColor: COLORS.light,
-    width,
+    width:150,
     marginHorizontal: 2,
     borderRadius: 10,
     marginBottom: 20,

@@ -66,24 +66,27 @@ export default function EmailRegistrationScreen() {
         return res;
     }
 
-    const startImageRotateFunction = () => {
-        rotateValueHolder.setValue(0);
-        Animated.timing(rotateValueHolder, {
-            toValue: 1,
-            duration: 50000,
-            easing: Easing.linear,
-            useNativeDriver: false,
-        }).start(() => startImageRotateFunction());
-    };
+    
 
     const RotateData = rotateValueHolder.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg'],
     });
-    startImageRotateFunction();
     useEffect(() => {
         validate(false);
     }, [email])
+    useEffect(()=>{
+        const startImageRotateFunction = () => {
+            rotateValueHolder.setValue(0);
+            Animated.timing(rotateValueHolder, {
+                toValue: 1,
+                duration: 50000,
+                easing: Easing.linear,
+                useNativeDriver: false,
+            }).start(() => startImageRotateFunction());
+        };
+        startImageRotateFunction();
+    },[])
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" />

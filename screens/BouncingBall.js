@@ -65,7 +65,7 @@ export default class BouncingBall extends PureComponent {
         toValue: {x: circle.x, y: circle.y},
         duration: animationDuration,
         easing: animationType,
-        useNativeDriver:false
+        useNativeDriver: false
       },
     ).start(() => {
       const currentPosition = this.state[`position${index}`];

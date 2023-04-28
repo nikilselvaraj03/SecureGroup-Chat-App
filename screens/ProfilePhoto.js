@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View,TouchableOpacity,Image,SafeAreaView,ActivityIndicator,Dimensions } from 'react-native'
+import { StyleSheet, Text, View,TouchableOpacity,Image,SafeAreaView,ActivityIndicator,Dimensions, Platform } from 'react-native'
 import React,{useState,useEffect} from 'react'
 import * as ImagePicker from 'expo-image-picker';
+import { userProfileRef } from '../firebase';
+import { uploadBytesResumable,ref,getDownloadURL } from 'firebase/storage';
 export default function ProfilePhoto({route,navigation}) {
   const [image, setImage] = useState(null);
   const [imageMetaData, setImageMetaData] = useState(null);
@@ -42,7 +44,8 @@ export default function ProfilePhoto({route,navigation}) {
   
     function generateUniqueFileName(filename) {
       // Get the file extension.
-      const extension = filename.split('.')[1];
+      const extension = filename ? filename.split('.')[1] : Platform.OS == 'ios' ? 'heic'  : 'jpg';
+
     
       // Generate a UUID.
       const uuid = uniqueName();

@@ -55,6 +55,7 @@ const NewGroupScreen = ({ userToken }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [addData, setAddData] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
+  const [showTags,setShowTags] = useState(true)
   // const [participants, setParticipants] = useState([]);
 
 
@@ -93,7 +94,7 @@ const uniqueName = () => {
 
   function generateUniqueFileName(filename) {
     // Get the file extension.
-    const extension = filename.split('.')[1];
+    const extension =  filename  ? filename.split('.')[1] : Platform.OS == 'ios' ? 'heic'  : 'jpg';
   
     // Generate a UUID.
     const uuid = uniqueName();
@@ -271,7 +272,7 @@ const uniqueName = () => {
   };
   return (
     <SafeAreaView style={styles.safeArea}>
-        <StatusBar backgroundColor="black" />
+        <StatusBar translucent={false} barStyle="dark-content"></StatusBar>
         <View style={styles.header}>
           {/* <TouchableOpacity style={styles.backButton} onPress={navigation.goBack()}>
             <Icon name="chevron-back-outline" size={26} color="#673AB7"></Icon>
@@ -329,9 +330,10 @@ const uniqueName = () => {
               itemTextColor="grey"
               displayKey="first_name"
               hideSubmitButton={false}
+              onToggleList = {()=>{setShowTags(!showTags)}}
             />
 
-       {!isDisappearingGroup &&  <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{maxHeight:65,marginTop:5}}>
+       {!isDisappearingGroup && showTags &&  <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{maxHeight:65,marginTop:5}}>
                 {selectedItems.map((item) => (
                   (<View key={item} style={{paddingVertical:10,paddingHorizontal:15, borderWidth:1, borderColor:'#616161', marginRight:15, borderRadius:20, maxHeight:40, alignItems:'center',display:'flex', justifyContent:'center'}}>
                   <Text  style={{ fontSize:16, color:'#616161' }}>
@@ -435,7 +437,6 @@ const styles = StyleSheet.create({
   inputField: {
     height: 40,
     borderWidth: 1,
-    borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 20,
     borderBottomWidth: 1,

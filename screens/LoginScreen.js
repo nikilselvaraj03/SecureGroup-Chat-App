@@ -82,7 +82,7 @@ const LoginScreen = ({ route, navigationParam }) => {
      <Home userToken={auth.currentUser} /> :
       (<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.loginContainer}>
-         <StatusBar barStyle= { Platform.OS == 'ios' ?  "light-content" : 'dark-content'}/> 
+        <StatusBar translucent={true} style="light"></StatusBar> 
           <View style={styles.selfAuthContainer}>
             <Text style={styles.title}>Welcome!</Text>
           <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>

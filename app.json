@@ -2,7 +2,7 @@
   "expo": {
     "name": "Topdeck",
     "slug": "Topdeck",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -20,8 +20,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "rgba(255, 255, 255, 0)"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
