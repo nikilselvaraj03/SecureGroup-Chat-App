@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nikilselvaraj07.Topdeck"
     },
     "android": {
       "adaptiveIcon": {

@@ -112,7 +112,7 @@ const ProfilePage = ({userinfo}) => {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
         <View style={styles.userInfoSection}>
-          <View style={{flexDirection: 'row', marginTop: 30, justifyContent: 'left', alignItems: 'left'}}>
+          <View style={{flexDirection: 'row', marginTop: 30}}>
             <Avatar.Image style={{backgroundColor:'#eaeaea'}}
               source={userinfo && userinfo.profile_photo_url ? {uri:userinfo.profile_photo_url} : require('../assets/images/avatarperson.png')} size={120}/>
              <View style={{marginLeft: 20}}>

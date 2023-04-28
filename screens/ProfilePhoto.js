@@ -1,12 +1,6 @@
-import { StyleSheet, Text, View,Image, Dimensions, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View,TouchableOpacity,Image,SafeAreaView,ActivityIndicator,Dimensions } from 'react-native'
+import React,{useState,useEffect} from 'react'
 import * as ImagePicker from 'expo-image-picker';
-import { userProfileRef } from '../firebase';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-
-
 export default function ProfilePhoto({route,navigation}) {
   const [image, setImage] = useState(null);
   const [imageMetaData, setImageMetaData] = useState(null);
@@ -15,99 +9,96 @@ export default function ProfilePhoto({route,navigation}) {
   const [profilePhotoURL, setProfilePhotoURL] =  useState('');
   const {email,first_name,last_name,date_of_birth} = route.params
   useEffect (() => {
-  (async () => {
-  const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  setHasGalleryPermission(galleryStatus.status ===
-  'granted');
-  })();
-},[])
-
-  if (hasGalleryPermission === false) {
-    return <Text>No access to Internal Storage</Text>
-  }
-const pickImage = async () => {
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 0,
-  });
-
-  if (!result.canceled) {
-    setImage(result.assets[0].uri);
-    setImageMetaData(result.assets[0])
-    uploadImage()
-  }
-};
-
-const uniqueName = () => {
-  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-  return uuid;
-}
-
-  function generateUniqueFileName(filename) {
-    // Get the file extension.
-    const extension = filename.split('.')[1];
+    (async () => {
+    const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    setHasGalleryPermission(galleryStatus.status ===
+    'granted');
+    })();
+  },[])
+  const pickImage = async () => {
+    if(hasGalleryPermission) {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0,
+    });
   
-    // Generate a UUID.
-    const uuid = uniqueName();
-  
-    // Return the file name with the UUID and extension.
-    return `${uuid}.${extension}`;
-  }
-
-  const uploadImage = async () => {
-    if(profilePhotoURL) {
-      // await deleteObject(profilePhotoURL)
-    }
-    if (!image) {
-      return;
-    } 
-    const img = await fetch(image)
-    const bytes = await img.blob();
-    setUploading(true);
-    const uploadTask = uploadBytesResumable(ref(userProfileRef,generateUniqueFileName(imageMetaData.fileName)), bytes);
-
-    // Register three observers:
-    // 1. 'state_changed' observer, called any time the state changes
-    // 2. Error observer, called on failure
-    // 3. Completion observer, called on successful completion
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        // Observe state change events such as progress, pause, and resume
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
-            break;
-          case 'running':
-            console.log('Upload is running');
-            break;
-        }
-      }, 
-      (error) => {
-        setUploading(false)
-        console.log(error)
-      }, 
-      () => {
-        // Handle successful uploads on complete
-        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log('File available at', downloadURL);
-          setProfilePhotoURL(downloadURL)
-        });
-        setUploading(false)
-      }
-    );
-    
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      setImageMetaData(result.assets[0])
+      uploadImage()
+    }}
   };
   
+  const uniqueName = () => {
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+    return uuid;
+  }
+  
+    function generateUniqueFileName(filename) {
+      // Get the file extension.
+      const extension = filename.split('.')[1];
+    
+      // Generate a UUID.
+      const uuid = uniqueName();
+    
+      // Return the file name with the UUID and extension.
+      return `${uuid}.${extension}`;
+    }
+  
+    const uploadImage = async () => {
+      if(profilePhotoURL) {
+        // await deleteObject(profilePhotoURL)
+      }
+      if (!image) {
+        return;
+      } 
+      const img = await fetch(image)
+      const bytes = await img.blob();
+      setUploading(true);
+      const uploadTask = uploadBytesResumable(ref(userProfileRef,generateUniqueFileName(imageMetaData.fileName)), bytes);
+  
+      // Register three observers:
+      // 1. 'state_changed' observer, called any time the state changes
+      // 2. Error observer, called on failure
+      // 3. Completion observer, called on successful completion
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Upload is ' + progress + '% done');
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Upload is paused');
+              break;
+            case 'running':
+              console.log('Upload is running');
+              break;
+          }
+        }, 
+        (error) => {
+          setUploading(false)
+          console.log(error)
+        }, 
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log('File available at', downloadURL);
+            setProfilePhotoURL(downloadURL)
+          });
+          setUploading(false)
+        }
+      );
+      
+    };
+    
   return (
     <SafeAreaView style={styles.container}>
     <View style={styles.heading}>
