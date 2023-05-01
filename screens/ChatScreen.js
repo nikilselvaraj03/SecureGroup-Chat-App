@@ -26,6 +26,7 @@ import {
   firestore,
   query,
   where,
+  onSnapshot,
   getDocs,
   arrayUnion,
   updateDoc,
@@ -36,18 +37,33 @@ const ChatScreen = ({ route, navigation }) => {
   const [message, setMessage] = useState("");
   const [userInfo, setuserinfo] = useState("");
   const [text, setText] = useState("");
+
   const { groupId, groupName } = route.params;
+
+  // const getMessages = async () => {
+  //   const docRef = doc(db, "chats", groupId);
+  //   const docSnap = await getDoc(docRef);
+    
+  //   if (docSnap.exists()) {
+  //     const messagesData = docSnap.data();
+  //     setMessages(messagesData);
+  //     console.log("checking messages.group_id", groupId);
+  //   } else {
+  //     console.log("no msg data found");
+  //   }
+  // };
 
   const getMessages = async () => {
     const docRef = doc(db, "chats", groupId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const messagesData = docSnap.data();
-      setMessages(messagesData);
-      console.log("checking messages.group_id",groupId)
-    } else {
-      console.log("no msg data found");
-    }
+    onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const messagesData = docSnap.data();
+        setMessages(messagesData);
+        console.log("checking messages.group_id", groupId);
+      } else {
+        console.log("no msg data found");
+      }
+    });
   };
 
   useEffect(() => {
@@ -57,58 +73,57 @@ const ChatScreen = ({ route, navigation }) => {
     getMessages();
     userInfromation();
   }, [groupId]);
-//
-const userInfromation = async () => {
-  const currentuser=auth.currentUser.uid;
-  const docRefer = doc(db, "users",currentuser);
-  const docSnap = await getDoc(docRefer);
-  const userInfo = docSnap.data();
-  setuserinfo(userInfo);
-};
-
-
+  //
+  const userInfromation = async () => {
+    const currentuser = auth.currentUser.uid;
+    const docRefer = doc(db, "users", currentuser);
+    const docSnap = await getDoc(docRefer);
+    const userInfo = docSnap.data();
+    setuserinfo(userInfo);
+  };
 
   const sendMessage = async () => {
-    const uniqueId = uuid.v4();
-    const useri = auth.currentUser.uid;
-    const chatDocRef = doc(db, "chats", groupId);
-    const chatDocSnapshot = await getDoc(chatDocRef);
-    const chatDocData = chatDocSnapshot.data();
-    if (!chatDocData) {
-      const docRef = await setDoc(doc(db, "chats", groupId), {
-        group_id: groupId,
-        group_name: groupName,
-        message: [
-          {
-            first_name: userInfo.first_name,
-            last_name: userInfo.last_name,
-            message_id: uniqueId,
-            message_text: text,
-            user_id: auth.currentUser.uid,
-          },
-        ],
-      }).then(async () => {
-        setText("");
-        await getMessages();
-      });
-    } else {
-      let newData = {
-        first_name: userInfo.first_name,
-        last_name: userInfo.last_name,
-        message_id: uniqueId,
-        message_text: text,
-        user_id: auth.currentUser.uid,
-      };
-      await updateDoc(chatDocRef, {
-        message: arrayUnion(newData),
-      }).then(async () => {
-        console.log("data updated");
-        setText("");
-        await getMessages();
-      });
+    if (text.trim() !== "") {
+      const uniqueId = uuid.v4();
+      const useri = auth.currentUser.uid;
+      const chatDocRef = doc(db, "chats", groupId);
+      const chatDocSnapshot = await getDoc(chatDocRef);
+      const chatDocData = chatDocSnapshot.data();
+      if (!chatDocData) {
+        const docRef = await setDoc(doc(db, "chats", groupId), {
+          group_id: groupId,
+          group_name: groupName,
+          message: [
+            {
+              first_name: userInfo.first_name,
+              last_name: userInfo.last_name,
+              message_id: uniqueId,
+              message_text: text,
+              user_id: auth.currentUser.uid,
+            },
+          ],
+        }).then(async () => {
+          setText("");
+          getMessages();
+        });
+      } else {
+        let newData = {
+          first_name: userInfo.first_name,
+          last_name: userInfo.last_name,
+          message_id: uniqueId,
+          message_text: text,
+          user_id: auth.currentUser.uid,
+        };
+        await updateDoc(chatDocRef, {
+          message: arrayUnion(newData),
+        }).then(async () => {
+          console.log("data updated");
+          setText("");
+          await getMessages();
+        });
+      }
     }
   };
-  
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -117,7 +132,7 @@ const userInfromation = async () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"} // set behavior prop to "padding"
       >
         <SafeAreaView style={styles.safeArea}>
-          <StatusBar backgroundColor="#616161" translucent={false}  />
+          <StatusBar backgroundColor="#616161" translucent={false} />
           <View style={styles.header}>
             {/* Your header content */}
             <TouchableOpacity
@@ -133,7 +148,7 @@ const userInfromation = async () => {
                 style={{
                   fontSize: 18,
                   color: "#616161",
-                  fontWeight:'400'
+                  fontWeight: "400",
                 }}
               >
                 Back
@@ -156,7 +171,11 @@ const userInfromation = async () => {
                 name="information-circle-outline"
                 size={24}
                 color="#616161"
-                onPress={() => navigation.navigate('GroupProfileScreen', { groupId:groupId, groupName:groupName})
+                onPress={() =>
+                  navigation.navigate("GroupProfileScreen", {
+                    groupId: groupId,
+                    groupName: groupName,
+                  })
                 }
               ></Icon>
             </TouchableOpacity>
@@ -166,46 +185,13 @@ const userInfromation = async () => {
             <ScrollView
               style={styles.messagesContainer}
               keyboardShouldPersistTaps="handled"
-            >{messages.message &&
-  messages.message.map((item) => {
-    return (
-      <React.Fragment key={item.message_id}>
-        {item.user_id != auth.currentUser.uid ? (
-          <Text
-            style={{
-              fontSize: 15,
-              color: "purple",
-              paddingBottom: 1,
-            }}
-          >
-            <Text>
-              {item.first_name.charAt(0).toUpperCase()}
-              {item.last_name.charAt(0).toUpperCase()}
-            </Text>
-          </Text>
-        ) : (
-          null
-        )}
-        <View
-          style={[
-            styles.message,
-            item.user_id == auth.currentUser.uid
-              ? styles.myMessage
-              : styles.otherUserMessage,
-          ]}
-        >
-          <Text style={styles.messageBody}>{item.message_text}</Text>
-        </View>
-      </React.Fragment>
-    );
-  })}
-
-              {/* {messages.message &&
+            >
+              {messages.message &&
                 messages.message.map((item) => {
                   return (
-                    <>
+                    <React.Fragment key={item.message_id}>
                       {item.user_id != auth.currentUser.uid ? (
-                        <Text key={item.message_id + " _name"}
+                        <Text
                           style={{
                             fontSize: 15,
                             color: "purple",
@@ -217,11 +203,8 @@ const userInfromation = async () => {
                             {item.last_name.charAt(0).toUpperCase()}
                           </Text>
                         </Text>
-                      ) : (
-                        ""
-                      )}
+                      ) : null}
                       <View
-                        key={item.message_id}
                         style={[
                           styles.message,
                           item.user_id == auth.currentUser.uid
@@ -233,9 +216,9 @@ const userInfromation = async () => {
                           {item.message_text}
                         </Text>
                       </View>
-                    </>
+                    </React.Fragment>
                   );
-                })} */}
+                })}
             </ScrollView>
 
             <View style={styles.inputContainer}>
@@ -270,8 +253,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    borderBottomWidth:StyleSheet.hairlineWidth,
-    borderBottomColor:'#616161'
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#616161",
   },
   body: {
     flex: 1,
