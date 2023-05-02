@@ -54,7 +54,7 @@ export default function LandingScreen({ userinfo }) {
           backgroundColor: COLORS.white,
         }}
       >
-        <StatusBar translucent={false} barStyle="dark-content"></StatusBar>
+        <StatusBar translucent={false} backgroundColor='#fff' barStyle="dark-content"></StatusBar>
         <View style={style.header}>
           <View>
             <Text
@@ -229,14 +229,14 @@ export default function LandingScreen({ userinfo }) {
     return (
       <>
         <View style={style.card}>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
               navigation.navigate("ChatScreen", {
                 groupId: groupid,
                 groupName: groups,
               });
             }}
-          > */}
+          >
           <View style={{ alignItems: "flex-end" }}>
             <TouchableOpacity onPress={() => {}}>
               <Icon
@@ -330,6 +330,7 @@ export default function LandingScreen({ userinfo }) {
               <Icon name="people" size={25} color="#b2b2b2" />
             </TouchableOpacity>
           </View>
+          </TouchableOpacity>
         </View>
       </>
     );

@@ -172,8 +172,8 @@ const ChatScreen = ({ route, navigation }) => {
           ></Icon>
         </TouchableOpacity>
       </View>
-      <View  style={{flex:1}} >
-      <View style={{flex:1}}>
+      <KeyboardAvoidingView  style={{flex:1}} behavior="height" keyboardVerticalOffset={Platform.OS == 'android' ?  40 :0}>
+      <View style={{flex:1,backgroundColor:'#fff'}}>
       <ScrollView
         enableResetScrollToCoords={true}
         contentContainerStyle={styles.container}
@@ -189,7 +189,7 @@ const ChatScreen = ({ route, navigation }) => {
                   <React.Fragment key={item.message_id}>
                     <View  style={{flexDirection: item.user_id == auth.currentUser.uid ? 'row-reverse' : "row"}}>
                     {item.user_id != auth.currentUser.uid ? (
-                      <Text
+                      <View
                         style={{
                           fontSize: 10,
                           color: "#ffffff",
@@ -205,11 +205,12 @@ const ChatScreen = ({ route, navigation }) => {
                           alignSelf:'center',
                         }}
                       >
-                        <Text>
+                        <Text style={{fontSize: 10,
+                          color: "#ffffff"}}>
                           {item.first_name.charAt(0).toUpperCase()}
                           {item.last_name.charAt(0).toUpperCase()}
                         </Text>
-                      </Text>
+                      </View>
                     ) : null}
                     <View
                       style={[
@@ -249,7 +250,7 @@ const ChatScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
         </View>
-        </View>
+        </KeyboardAvoidingView>
     </>
   );
 };
@@ -303,6 +304,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flex:.09,
+    minHeight:60,
     flexDirection: "row",
     alignItems: "center",
     padding: 20,

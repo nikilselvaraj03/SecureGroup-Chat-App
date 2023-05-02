@@ -16,10 +16,16 @@ const LoginScreen = ({ route, navigationParam }) => {
     const [error, setError] = useState('');
     const [isValid,setisValid] =  useState(false);
     const [loggedIn,setLoggedIn] = useState(false);
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
     useEffect(() => {
+      const keyboardDidShowListener = Keyboard.addListener(
+        'keyboardDidShow',
+        () => setIsKeyboardOpen(true)
+      );
         // Add a touch event listener to the root view
         const hideKeyboardOnPress = Keyboard.addListener('keyboardDidHide', () => {
           Keyboard.dismiss();
+          setIsKeyboardOpen(false)
         });
         const {fromSignUp} = route.params;
 
@@ -85,8 +91,8 @@ const LoginScreen = ({ route, navigationParam }) => {
         <StatusBar translucent={true} style="light"></StatusBar> 
           <View style={styles.selfAuthContainer}>
             <Text style={styles.title}>Welcome!</Text>
-          <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'position' }>
-          <TextInput placeholder='Email'  autoCapitalize="none" blurOnSubmit={true} onSubmitEditing={()=>validate(false)} value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
+          <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
+          <TextInput placeholder='Email'  softwareKeyboardLayoutMode="pan" autoCapitalize="none" blurOnSubmit={true} onSubmitEditing={()=>validate(false)} value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
           <TextInput placeholder='Password' value={password} onChangeText={password => setPassword(password)} secureTextEntry style={styles.inputContainer} placeholderTextColor="#fff"/>
           { (
             <Text style={error ? styles.error : styles.hidden_error}> {error} </Text>)}
@@ -100,12 +106,21 @@ const LoginScreen = ({ route, navigationParam }) => {
           </TouchableOpacity>
           </KeyboardAvoidingView>
           </View>
-          <View style={styles.fbAuthContainer}>
-          </View>
+          {Platform.OS == 'android' && !isKeyboardOpen && (<View style={styles.fbAuthContainer}>
+          </View> )}
+          {Platform.OS == 'android' && !isKeyboardOpen && (
           <View style={styles.links}>
             <TouchableOpacity onPress={handleSignUpClick}><Text style={styles.registerLink}>Sign up</Text></TouchableOpacity>
             <TouchableOpacity onPress={()=>{navigation.navigate('PasswordReset')}}><Text style={styles.forgotLink}>Forgot Password?</Text></TouchableOpacity>
-        </View>
+        </View>)}
+
+        {Platform.OS == 'ios' && (<View style={styles.fbAuthContainer}>
+          </View> )}
+          {Platform.OS == 'ios' && (
+          <View style={styles.links}>
+            <TouchableOpacity onPress={handleSignUpClick}><Text style={styles.registerLink}>Sign up</Text></TouchableOpacity>
+            <TouchableOpacity onPress={()=>{navigation.navigate('PasswordReset')}}><Text style={styles.forgotLink}>Forgot Password?</Text></TouchableOpacity>
+        </View>)}
         </View></TouchableWithoutFeedback>)
       )
     }

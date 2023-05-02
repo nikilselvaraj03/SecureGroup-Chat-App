@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -57,7 +57,6 @@ export default function Home({userToken}) {
     }
     }
     fetchUserInfo()
-
     return unsubscribe;
   }, []);
 
@@ -93,6 +92,7 @@ export default function Home({userToken}) {
         labelStyle: {paddingBottom: 10, fontSize: 10}
       }}
       tabBarHideOnKeyboard={true} // This will hide the tab bar when the keyboard is displayed
+      waitForRender={true}
     >
                 <Tab.Screen name={home} options={{headerShown:false, tabBarHideOnKeyboard:true}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
