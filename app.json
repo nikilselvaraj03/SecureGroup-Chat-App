@@ -27,7 +27,6 @@
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "softwareKeyboardLayoutMode": "pan",
       "package": "com.nikilselvaraj07.Topdeck"
     },
     "web": {

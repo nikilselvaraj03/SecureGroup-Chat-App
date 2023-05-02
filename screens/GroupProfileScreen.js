@@ -160,7 +160,7 @@ const GroupProfileScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.loginContainer}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView>
         <View>
           <TouchableOpacity
@@ -316,7 +316,7 @@ export default GroupProfileScreen;
 
 const styles = StyleSheet.create({
   loginContainer: {
-    paddingTop: StatusBar.currentHeight,
+    paddingTop: Platform.OS == 'ios' ?  StatusBar.currentHeight : 0,
     flex: 1,
     backgroundColor: "white",
     marginBottom: 0,

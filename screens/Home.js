@@ -94,7 +94,7 @@ export default function Home({userToken}) {
       }}
       tabBarHideOnKeyboard={true} // This will hide the tab bar when the keyboard is displayed
     >
-                <Tab.Screen name={home} options={{headerShown:false}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
+                <Tab.Screen name={home} options={{headerShown:false, tabBarHideOnKeyboard:true}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
                 <Tab.Screen name={creategroup} options={{headerShown:true}} component={NewGroupScreen}/>
                 <Tab.Screen name={contacts} options={{headerShown:false}}>{() => <Contacts userinfo={userinfo} />}</Tab.Screen>

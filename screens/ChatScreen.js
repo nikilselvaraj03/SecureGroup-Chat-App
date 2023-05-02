@@ -129,6 +129,7 @@ const ChatScreen = ({ route, navigation }) => {
   return (
     <>
       <View style={styles.header}>
+      <StatusBar backgroundColor="#ffffff" translucent={false} />
         {/* Your header content */}
         <TouchableOpacity
           style={styles.backButton}
@@ -171,7 +172,7 @@ const ChatScreen = ({ route, navigation }) => {
           ></Icon>
         </TouchableOpacity>
       </View>
-      <KeyboardAvoidingView  style={{flex:1}} behavior="height">
+      <View  style={{flex:1}} >
       <View style={{flex:1}}>
       <ScrollView
         enableResetScrollToCoords={true}
@@ -180,19 +181,28 @@ const ChatScreen = ({ route, navigation }) => {
         style={{flex:2}}
       >
         <View style={styles.safeArea}>
-          <StatusBar backgroundColor="#616161" translucent={false} />
 
           <View style={styles.body}>
             {messages.message &&
               messages.message.map((item) => {
                 return (
                   <React.Fragment key={item.message_id}>
+                    <View  style={{flexDirection: item.user_id == auth.currentUser.uid ? 'row-reverse' : "row"}}>
                     {item.user_id != auth.currentUser.uid ? (
                       <Text
                         style={{
-                          fontSize: 15,
-                          color: "purple",
+                          fontSize: 10,
+                          color: "#ffffff",
                           paddingBottom: 1,
+                          flexDirection:'row',
+                          marginRight:10,
+                          borderRadius:30,
+                          height:25,
+                          width:25,
+                          justifyContent:'center',
+                          backgroundColor:'#212121',
+                          padding:6,
+                          alignSelf:'center',
                         }}
                       >
                         <Text>
@@ -212,6 +222,7 @@ const ChatScreen = ({ route, navigation }) => {
                       <Text style={styles.messageBody}>
                         {item.message_text}
                       </Text>
+                    </View>
                     </View>
                   </React.Fragment>
                 );
@@ -238,7 +249,7 @@ const ChatScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
         </View>
-        </KeyboardAvoidingView>
+        </View>
     </>
   );
 };
@@ -250,7 +261,7 @@ const styles = StyleSheet.create({
   header: {
     height: 50,
     backgroundColor: "#ffffff",
-    marginTop: 50,
+    marginTop: Platform.OS == 'ios' ? 50 : 0,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -335,10 +346,5 @@ const styles = StyleSheet.create({
   },
 });
 
-ChatScreen.navigationOptions = ({ navigation }) => {
-  return {
-    tabBarVisible: false,
-  };
-};
 
 export default ChatScreen;

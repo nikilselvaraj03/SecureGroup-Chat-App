@@ -54,6 +54,7 @@ export default function LandingScreen({ userinfo }) {
           backgroundColor: COLORS.white,
         }}
       >
+        <StatusBar translucent={false} barStyle="dark-content"></StatusBar>
         <View style={style.header}>
           <View>
             <Text
@@ -222,17 +223,16 @@ export default function LandingScreen({ userinfo }) {
     const isLiked =
       likedGroups.findIndex((likedGroup) => likedGroup.id === groupid) !== -1;
     return (
-      <TouchableOpacity
-        
-        onPress={() => {
-          navigation.navigate("ChatScreen", {
-            groupId: groupid,
-            groupName: groups,
-          });
-        }}
-      >
-        <StatusBar translucent={false} barStyle="dark-content"></StatusBar>
+      <>
         <View style={style.card}>
+          {/* <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("ChatScreen", {
+                groupId: groupid,
+                groupName: groups,
+              });
+            }}
+          > */}
           <View style={{ alignItems: "flex-end" }}>
             <TouchableOpacity onPress={() => {}}>
               <Icon
@@ -270,9 +270,15 @@ export default function LandingScreen({ userinfo }) {
             numberOfLines={1}
             style={{
               fontWeight: "bold",
-              fontSize: 17,
+              fontSize: 20,
               marginTop: 10,
               textAlign: "center",
+            }}
+            onPress={() => {
+              navigation.navigate("ChatScreen", {
+                groupId: groupid,
+                groupName: groups,
+              });
             }}
           >
             {groups}
@@ -321,7 +327,7 @@ export default function LandingScreen({ userinfo }) {
             </TouchableOpacity>
           </View>
         </View>
-      </TouchableOpacity>
+      </>
     );
   };
   return (
