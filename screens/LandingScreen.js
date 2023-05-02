@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ChatScreen from "./ChatScreen";
-import GroupProfileScreen from "./GroupProfileScreen";
 import {
   View,
   SafeAreaView,
@@ -25,12 +23,8 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
-import Toast from "react-native-root-toast";
 import COLORS from "../consts/colors";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-export default function LandingScreen({ userinfo }) {
-  const Stack = createNativeStackNavigator();
+export default function LandingScreen({navigationProps,route}) {
   const navigation = useNavigation();
   const [groups, setGroups] = useState([]);
   const todoRef = collection(db, "Groups");
@@ -39,12 +33,14 @@ export default function LandingScreen({ userinfo }) {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [filteredGroups, setFilteredGroups] = useState(groups);
   const [isLoading, setisLoading] = useState(true);
+  const {userinfo} = route.params
   const isEmptyGroups = () => {
     return (
-      !(groups && groups.length > 0) ||
-      (filteredGroups && filteredGroups.length)
+      !((groups && groups.length > 0) ||
+      (filteredGroups && filteredGroups.length))
     );
   };
+
   const LandingScreenValue = () => {
     return (
       <SafeAreaView
@@ -84,6 +80,7 @@ export default function LandingScreen({ userinfo }) {
               }}
             />
           </View>
+          
           <View style={style.sortBtn}>
             <Icon name="sort" size={30} color="white" />
           </View>
@@ -127,7 +124,7 @@ export default function LandingScreen({ userinfo }) {
                 paddingBottom: 20,
               }}
             >
-              Seems like you are'nt in any groups.{"\n\n"} Go ahead and create
+              Seems like you aren't in any groups.{"\n\n"} Go ahead and create
               one
             </Text>
           </View>
@@ -336,24 +333,8 @@ export default function LandingScreen({ userinfo }) {
     );
   };
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        options={{ headerShown: false }}
-        name="Landing"
-        component={LandingScreenValue}
-      />
-      <Stack.Screen
-        options={{ headerShown: false }}
-        name="ChatScreen"
-        component={ChatScreen}
-      />
-      <Stack.Screen
-        options={{ headerShown: false }}
-        name="GroupProfileScreen"
-        component={GroupProfileScreen}
-      />
-    </Stack.Navigator>
-  );
+    LandingScreenValue()
+  )
 }
 
 const style = StyleSheet.create({

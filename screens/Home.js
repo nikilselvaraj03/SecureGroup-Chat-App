@@ -6,14 +6,11 @@ import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/n
 import Toast from 'react-native-root-toast';
 
 import Contacts from './Contacts';
-import CreateGroup from './CreateGroup';
-import LandingScreen from './LandingScreen';
 import ProfilePage from './ProfilePage';
 import NewGroupScreen from './NewGroupScreen';
-import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import HomeScreenLayout from './HomeScreenLayout';
 
 
 const home = 'Home';
@@ -91,10 +88,9 @@ export default function Home({userToken}) {
         marginTop: 10,
         labelStyle: {paddingBottom: 10, fontSize: 10}
       }}
-      tabBarHideOnKeyboard={true} // This will hide the tab bar when the keyboard is displayed
-      waitForRender={true}
+      // This will hide the tab bar when the keyboard is displayed
     >
-                <Tab.Screen name={home} options={{headerShown:false, tabBarHideOnKeyboard:true}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
+                <Tab.Screen name={home} options={{headerShown:false, tabBarHideOnKeyboard:true}}>{() => <HomeScreenLayout userDetails={userinfo} />}</Tab.Screen>  
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
                 <Tab.Screen name={creategroup} options={{headerShown:true}} component={NewGroupScreen}/>
                 <Tab.Screen name={contacts} options={{headerShown:false}}>{() => <Contacts userinfo={userinfo} />}</Tab.Screen>
