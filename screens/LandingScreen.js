@@ -55,7 +55,7 @@ export default function LandingScreen({userinfo}) {
     {
    !isEmptyGroups() ?
     (<FlatList
-      columnWrapperStyle={{justifyContent: 'space-around'}}
+      columnWrapperStyle={{ justifyContent: (filteredGroups && filteredGroups.lenth > 1 || groups && groups.length > 1) ? 'space-around' : 'space-between'}}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         marginTop: 10,

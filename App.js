@@ -17,7 +17,7 @@ export default function App() {
       await SplashScreen.preventAutoHideAsync();
       setTimeout(() => {
         SplashScreen.hideAsync();
-      }, 1700);
+      }, 1900);
     };
   
     hideSplashScreen();
