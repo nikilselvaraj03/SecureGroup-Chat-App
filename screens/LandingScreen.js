@@ -90,11 +90,13 @@ export default function LandingScreen({ userinfo }) {
         </View>
         {!isEmptyGroups() ? (
           <FlatList
-            columnWrapperStyle={{ justifyContent: "space-around" }}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               marginTop: 10,
               paddingBottom: 50,
+              width:Dimensions.get('window').width -35,
+              alignSelf:'center'
             }}
             numColumns={2}
             data={searchQuery ? filteredGroups : groups}
@@ -149,7 +151,7 @@ export default function LandingScreen({ userinfo }) {
           rtrgroups.push(doc.data());
         });
         setGroups(rtrgroups);
-        deleteDisappearedGroups();
+        deleteDisappearedGroups(rtrgroups);
       }
     }
     setisLoading(false);
@@ -162,10 +164,10 @@ export default function LandingScreen({ userinfo }) {
     fetchData();
   }, [userinfo]);
 
-  const deleteDisappearedGroups = () => {
-    console.log("in dissapearing groups:", JSON.stringify(groups));
+  const deleteDisappearedGroups = (rgroups) => {
+    console.log("outside checking dissapearing groups:", JSON.stringify(rgroups));
     const currentDate = new Date(); // format the current date as 'DD/MM/YYYY'
-    groups.forEach(async (group) => {
+    rgroups.forEach(async (group) => {
       if (group.isDisappearingGroup) {
         console.log("in dissapearing groups");
         const milliseconds =
@@ -180,7 +182,9 @@ export default function LandingScreen({ userinfo }) {
           selectedDate.getMonth() === currentDate.getMonth() &&
           selectedDate.getFullYear() === currentDate.getFullYear()
         ) {
-          await deleteDoc(doc(db, "Groups", group.Groupid));
+          await deleteDoc(doc(db, "Groups", group.Groupid)).then(()=>{
+            setGroups(rgroups.filter((g)=>{return g.Groupid !== group.Groupid}))
+          })
           console.log("group deleted");
         }
       }
@@ -376,7 +380,7 @@ const style = StyleSheet.create({
   card: {
     height: 225,
     backgroundColor: COLORS.light,
-    width: 150,
+    width: 160,
     marginHorizontal: 2,
     borderRadius: 10,
     marginBottom: 20,
