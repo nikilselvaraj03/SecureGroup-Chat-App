@@ -17,6 +17,11 @@ const LoginScreen = ({ route, navigationParam }) => {
     const [isValid,setisValid] =  useState(false);
     const [loggedIn,setLoggedIn] = useState(false);
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+    const {fromSignUp} = route.params;
+    if(fromSignUp) {
+      auth.currentUser = null;
+      auth.signOut()
+  }
     useEffect(() => {
       const keyboardDidShowListener = Keyboard.addListener(
         'keyboardDidShow',
@@ -27,12 +32,7 @@ const LoginScreen = ({ route, navigationParam }) => {
           Keyboard.dismiss();
           setIsKeyboardOpen(false)
         });
-        const {fromSignUp} = route.params;
-
-        if(fromSignUp) {
-            auth.currentUser = null;
-            auth.signOut()
-        }
+        
 
         // Clean up the event listener on unmount
         return () => {
