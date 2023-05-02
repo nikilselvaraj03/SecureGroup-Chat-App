@@ -85,7 +85,7 @@ const LoginScreen = ({ route, navigationParam }) => {
         <StatusBar translucent={true} style="light"></StatusBar> 
           <View style={styles.selfAuthContainer}>
             <Text style={styles.title}>Welcome!</Text>
-          <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }>
+          <KeyboardAvoidingView behavior={ Platform.OS === 'ios' ? 'padding' : 'position' }>
           <TextInput placeholder='Email'  autoCapitalize="none" blurOnSubmit={true} onSubmitEditing={()=>validate(false)} value={email} onChangeText={email => setEmail(email)} style={styles.inputContainer} placeholderTextColor="#fff" />
           <TextInput placeholder='Password' value={password} onChangeText={password => setPassword(password)} secureTextEntry style={styles.inputContainer} placeholderTextColor="#fff"/>
           { (

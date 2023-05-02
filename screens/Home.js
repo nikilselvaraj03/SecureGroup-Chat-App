@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -13,6 +13,7 @@ import NewGroupScreen from './NewGroupScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const home = 'Home';
@@ -65,38 +66,41 @@ export default function Home({userToken}) {
     return routeName
   }
   return (
-            <Tab.Navigator initialRouteName={home} screenOptions={({route}) => ({
-                tabBarIcon: ({focused, color, size}) => {
-                    let iconName;
-                    let rn = route.name;
-                    if(rn === profile){
-                        iconName = focused ? 'person-circle-outline' : 'person-outline'
-                    } else if (rn === contacts) {
-                        iconName = focused ? 'list' : 'list-outline'
-                    } else if (rn === creategroup){
-                        iconName = focused ? 'add-circle-outline' : 'add-outline'
-
-                    }else if (rn === home){
-                        iconName = focused ? 'home' : 'home-outline'
-
-                    }
-                    return <Ionicons name={iconName} size={size} color={color} />
-                },
-                tabBarStyle:{
-                  activeTintColor: 'tomato',
-                  inactiveTintColor: 'black',
-                  labelStyle: { paddingBottom:10, fontSize: 10},
-              }
-            })}
-           
-            >
-                <Tab.Screen name={home} options={{
-                  headerShown:false}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
+    <KeyboardAvoidingView  behavior="height" style={{flex:1}}>
+             <Tab.Navigator
+      initialRouteName={home}
+      screenOptions={({route}) => ({
+        tabBarHideOnKeyboard:true,
+        tabBarIcon: ({focused, color, size}) => {
+          let iconName;
+          let rn = route.name;
+          if (rn === profile) {
+            iconName = focused ? 'person-circle-outline' : 'person-outline'
+          } else if (rn === contacts) {
+            iconName = focused ? 'list' : 'list-outline'
+          } else if (rn === creategroup) {
+            iconName = focused ? 'add-circle-outline' : 'add-outline'
+          } else if (rn === home) {
+            iconName = focused ? 'home' : 'home-outline'
+          }
+          return <Ionicons name={iconName} size={size} color={color} />
+        }
+      })}
+      tabBarStyle={{
+        activeTintColor: 'tomato',
+        inactiveTintColor: 'black',
+        marginTop: 10,
+        labelStyle: {paddingBottom: 10, fontSize: 10}
+      }}
+      tabBarHideOnKeyboard={true} // This will hide the tab bar when the keyboard is displayed
+    >
+                <Tab.Screen name={home} options={{headerShown:false}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
                 <Tab.Screen name={creategroup} options={{headerShown:true}} component={NewGroupScreen}/>
                 <Tab.Screen name={contacts} options={{headerShown:false}}>{() => <Contacts userinfo={userinfo} />}</Tab.Screen>
                 <Tab.Screen name={profile} options={{headerShown:false}}>{() => <ProfilePage userinfo={userinfo} />}</Tab.Screen>                
           </Tab.Navigator>
+        </KeyboardAvoidingView>
   )
 }
 
