@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { db } from '../firebase';
-import { useNavigation } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-root-toast';
 
 import Contacts from './Contacts';
@@ -59,6 +59,11 @@ export default function Home({userToken}) {
 
     return unsubscribe;
   }, []);
+
+  function getrouteName(route) {
+    const routeName = getFocusedRouteNameFromRoute(route)
+    return routeName
+  }
   return (
             <Tab.Navigator initialRouteName={home} screenOptions={({route}) => ({
                 tabBarIcon: ({focused, color, size}) => {
@@ -76,16 +81,17 @@ export default function Home({userToken}) {
 
                     }
                     return <Ionicons name={iconName} size={size} color={color} />
-                }
+                },
+                tabBarStyle:{
+                  activeTintColor: 'tomato',
+                  inactiveTintColor: 'black',
+                  labelStyle: { paddingBottom:10, fontSize: 10},
+              }
             })}
-            tabBarStyle={{
-                activeTintColor: 'tomato',
-                inactiveTintColor: 'black',
-                marginTop:10,
-                labelStyle: { paddingBottom:10, fontSize: 10}
-            }}
+           
             >
-                <Tab.Screen name={home} options={{headerShown:false}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
+                <Tab.Screen name={home} options={{
+                  headerShown:false}}>{() => <LandingScreen userinfo={userinfo} />}</Tab.Screen>  
                 {/* <Tab.Screen name={home} options={{headerShown:false}} initialParams={{userinfo}} />  */}
                 <Tab.Screen name={creategroup} options={{headerShown:true}} component={NewGroupScreen}/>
                 <Tab.Screen name={contacts} options={{headerShown:false}}>{() => <Contacts userinfo={userinfo} />}</Tab.Screen>

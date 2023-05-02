@@ -15,6 +15,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import {
   collection,
@@ -31,6 +32,7 @@ import {
   arrayUnion,
   updateDoc,
 } from "firebase/firestore";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/Ionicons";
 const ChatScreen = ({ route, navigation }) => {
   const [messages, setMessages] = useState({});
@@ -43,7 +45,7 @@ const ChatScreen = ({ route, navigation }) => {
   // const getMessages = async () => {
   //   const docRef = doc(db, "chats", groupId);
   //   const docSnap = await getDoc(docRef);
-    
+
   //   if (docSnap.exists()) {
   //     const messagesData = docSnap.data();
   //     setMessages(messagesData);
@@ -65,7 +67,6 @@ const ChatScreen = ({ route, navigation }) => {
       }
     });
   };
-
   useEffect(() => {
     // alert(auth.currentUser.uid);
     // alert(groupId);
@@ -126,129 +127,130 @@ const ChatScreen = ({ route, navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"} // set behavior prop to "padding"
+    <>
+      <View style={styles.header}>
+        {/* Your header content */}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="chevron-back-outline" size={20} color="#616161"></Icon>
+          <Text
+            style={{
+              fontSize: 18,
+              color: "#616161",
+              fontWeight: "400",
+            }}
+          >
+            Back
+          </Text>
+        </TouchableOpacity>
+        <View>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: 400,
+              color: "#616161",
+              marginRight: "10%",
+            }}
+          >
+            {groupName}
+          </Text>
+        </View>
+        <TouchableOpacity>
+          <Icon
+            name="information-circle-outline"
+            size={24}
+            color="#616161"
+            onPress={() =>
+              navigation.navigate("GroupProfileScreen", {
+                groupId: groupId,
+                groupName: groupName,
+              })
+            }
+          ></Icon>
+        </TouchableOpacity>
+      </View>
+      <KeyboardAvoidingView  style={{flex:1}} behavior="height">
+      <View style={{flex:1}}>
+      <ScrollView
+        enableResetScrollToCoords={true}
+        contentContainerStyle={styles.container}
+        extraScrollHeight={-60}
+        style={{flex:2}}
       >
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.safeArea}>
           <StatusBar backgroundColor="#616161" translucent={false} />
-          <View style={styles.header}>
-            {/* Your header content */}
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Icon
-                name="chevron-back-outline"
-                size={20}
-                color="#616161"
-              ></Icon>
-              <Text
-                style={{
-                  fontSize: 18,
-                  color: "#616161",
-                  fontWeight: "400",
-                }}
-              >
-                Back
-              </Text>
-            </TouchableOpacity>
-            <View>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: 400,
-                  color: "#616161",
-                  marginRight: "10%",
-                }}
-              >
-                {groupName}
-              </Text>
-            </View>
-            <TouchableOpacity>
-              <Icon
-                name="information-circle-outline"
-                size={24}
-                color="#616161"
-                onPress={() =>
-                  navigation.navigate("GroupProfileScreen", {
-                    groupId: groupId,
-                    groupName: groupName,
-                  })
-                }
-              ></Icon>
-            </TouchableOpacity>
-          </View>
 
           <View style={styles.body}>
-            <ScrollView
-              style={styles.messagesContainer}
-              keyboardShouldPersistTaps="handled"
-            >
-              {messages.message &&
-                messages.message.map((item) => {
-                  return (
-                    <React.Fragment key={item.message_id}>
-                      {item.user_id != auth.currentUser.uid ? (
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            color: "purple",
-                            paddingBottom: 1,
-                          }}
-                        >
-                          <Text>
-                            {item.first_name.charAt(0).toUpperCase()}
-                            {item.last_name.charAt(0).toUpperCase()}
-                          </Text>
-                        </Text>
-                      ) : null}
-                      <View
-                        style={[
-                          styles.message,
-                          item.user_id == auth.currentUser.uid
-                            ? styles.myMessage
-                            : styles.otherUserMessage,
-                        ]}
+            {messages.message &&
+              messages.message.map((item) => {
+                return (
+                  <React.Fragment key={item.message_id}>
+                    {item.user_id != auth.currentUser.uid ? (
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          color: "purple",
+                          paddingBottom: 1,
+                        }}
                       >
-                        <Text style={styles.messageBody}>
-                          {item.message_text}
+                        <Text>
+                          {item.first_name.charAt(0).toUpperCase()}
+                          {item.last_name.charAt(0).toUpperCase()}
                         </Text>
-                      </View>
-                    </React.Fragment>
-                  );
-                })}
-            </ScrollView>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Type your message here"
-                placeholderTextColor="#d3d3d3"
-                value={text}
-                onChangeText={(message_text) => setText(message_text)}
-              />
-
-              <TouchableOpacity style={styles.button} onPress={sendMessage}>
-                <Icon name="paper-plane-outline" size={15} color="white"></Icon>
-              </TouchableOpacity>
-            </View>
+                      </Text>
+                    ) : null}
+                    <View
+                      style={[
+                        styles.message,
+                        item.user_id == auth.currentUser.uid
+                          ? styles.myMessage
+                          : styles.otherUserMessage,
+                      ]}
+                    >
+                      <Text style={styles.messageBody}>
+                        {item.message_text}
+                      </Text>
+                    </View>
+                  </React.Fragment>
+                );
+              })}
           </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        </View>
+
+      </ScrollView>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Type your message here"
+            placeholderTextColor="#d3d3d3"
+            value={text}
+            onChangeText={(message_text) => setText(message_text)}
+          />
+
+          <TouchableOpacity
+            style={[styles.button, { opacity: text.length > 0 ? 1 : 0.5 }]}
+            onPress={sendMessage}
+            disabled={text.length === 0}
+          >
+            <Icon name="paper-plane-outline" size={15} color="white"></Icon>
+          </TouchableOpacity>
+        </View>
+        </View>
+        </KeyboardAvoidingView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
     backgroundColor: "#ffffff",
   },
   header: {
     height: 50,
     backgroundColor: "#ffffff",
+    marginTop: 50,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -289,12 +291,14 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   inputContainer: {
+    flex:.09,
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 10,
+    padding: 20,
+    backgroundColor: "white"
   },
   input: {
-    flex: 1,
+    width:Dimensions.get('window').width - 100,
     height: 40,
     borderColor: "#d3d3d3",
     fontSize: 16,
@@ -330,5 +334,11 @@ const styles = StyleSheet.create({
     color: "#673AB7",
   },
 });
+
+ChatScreen.navigationOptions = ({ navigation }) => {
+  return {
+    tabBarVisible: false,
+  };
+};
 
 export default ChatScreen;

@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Platform } from "react-native";
 import { auth, db } from "../firebase";
-import * as ImagePicker from 'expo-image-picker';
-import { groupProfileRef } from '../firebase';
-import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import * as ImagePicker from "expo-image-picker";
+import { groupProfileRef } from "../firebase";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 import {
@@ -19,7 +24,7 @@ import {
   where,
   getDocs,
   deleteDoc,
-  query
+  query,
 } from "firebase/firestore";
 import uuid from "uuid";
 import { Firestore } from "firebase/app";
@@ -49,23 +54,23 @@ const NewGroupScreen = ({ userToken }) => {
   const [image, setImage] = useState(null);
   const [imageMetaData, setImageMetaData] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [hasGalleryPermission, setHasGalleryPermission] = useState (null);
-  const [profilePhotoURL, setProfilePhotoURL] =  useState('');
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  const [profilePhotoURL, setProfilePhotoURL] = useState("");
   const [isDisappearingGroup, setIsDisappearingGroup] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [addData, setAddData] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
-  const [showTags,setShowTags] = useState(true)
+  const [showTags, setShowTags] = useState(true);
+  const [showDatePicker, setShowDatePicker] = useState(true);
   // const [participants, setParticipants] = useState([]);
 
-
-  useEffect (() => {
+  useEffect(() => {
     (async () => {
-    const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    setHasGalleryPermission(galleryStatus.status ===
-    'granted');
+      const galleryStatus =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasGalleryPermission(galleryStatus.status === "granted");
     })();
-  },[])
+  }, []);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -76,89 +81,100 @@ const NewGroupScreen = ({ userToken }) => {
     });
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      setImageMetaData(result.assets[0])
-      uploadImage()
+      setImageMetaData(result.assets[0]);
+      uploadImage();
     }
   };
 
-
-
-const uniqueName = () => {
-  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-  return uuid;
-}
+  const uniqueName = () => {
+    const uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      }
+    );
+    return uuid;
+  };
 
   function generateUniqueFileName(filename) {
     // Get the file extension.
-    const extension =  filename  ? filename.split('.')[1] : Platform.OS == 'ios' ? 'heic'  : 'jpg';
-  
+    const extension = filename
+      ? filename.split(".")[1]
+      : Platform.OS == "ios"
+      ? "heic"
+      : "jpg";
+
     // Generate a UUID.
     const uuid = uniqueName();
-  
+
     // Return the file name with the UUID and extension.
     return `${uuid}.${extension}`;
   }
 
   const uploadImage = async () => {
-    if(profilePhotoURL) {
+    if (profilePhotoURL) {
       // await deleteObject(profilePhotoURL)
     }
     if (!image) {
       return;
-    } 
-    const img = await fetch(image)
+    }
+    const img = await fetch(image);
     const bytes = await img.blob();
     setUploading(true);
-    const uploadTask = uploadBytesResumable(ref(groupProfileRef,generateUniqueFileName(imageMetaData.fileName)), bytes);
+    const uploadTask = uploadBytesResumable(
+      ref(groupProfileRef, generateUniqueFileName(imageMetaData.fileName)),
+      bytes
+    );
 
     // Register three observers:
     // 1. 'state_changed' observer, called any time the state changes
     // 2. Error observer, called on failure
     // 3. Completion observer, called on successful completion
-    uploadTask.on('state_changed', 
+    uploadTask.on(
+      "state_changed",
       (snapshot) => {
         // Observe state change events such as progress, pause, and resume
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
+          case "paused":
+            console.log("Upload is paused");
             break;
-          case 'running':
-            console.log('Upload is running');
+          case "running":
+            console.log("Upload is running");
             break;
         }
-      }, 
+      },
       (error) => {
-        setUploading(false)
-        console.log(error)
-      }, 
+        setUploading(false);
+        console.log(error);
+      },
       () => {
         // Handle successful uploads on complete
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log('File available at', downloadURL);
-          setProfilePhotoURL(downloadURL)
+          console.log("File available at", downloadURL);
+          setProfilePhotoURL(downloadURL);
         });
-        setUploading(false)
+        setUploading(false);
       }
     );
-    
   };
   // const [userData, setUserData] = useState(null);
   // const [docId, setDocId] = useState("");
   const [userDocs, setUserDocs] = useState([]);
 
   const handleDateChange = (newDate) => {
+    if (Platform.OS == "android") {
+      setShowDatePicker(false);
+    }
     setSelectedDate(newDate);
   };
 
-  
   const deleteDocsByDate = async (collectionName, date) => {
     // try {
     //   const collectionRef = collection(db,collectionName);
@@ -188,7 +204,7 @@ const uniqueName = () => {
       isDisappearingGroup,
       // admin: Auth.currentuser.uid,
       selectedDate: isDisappearingGroup ? selectedDate : null,
-      groupPhotoUrl:profilePhotoURL
+      groupPhotoUrl: profilePhotoURL,
     }).then(() => {
       console.log("Group created");
       setAddData("");
@@ -272,9 +288,9 @@ const uniqueName = () => {
   };
   return (
     <SafeAreaView style={styles.safeArea}>
-        <StatusBar translucent={false} barStyle="dark-content"></StatusBar>
-        <View style={styles.header}>
-          {/* <TouchableOpacity style={styles.backButton} onPress={navigation.goBack()}>
+      <StatusBar translucent={false} barStyle="dark-content"></StatusBar>
+      <View style={styles.header}>
+        {/* <TouchableOpacity style={styles.backButton} onPress={navigation.goBack()}>
             <Icon name="chevron-back-outline" size={26} color="#673AB7"></Icon>
             <Text
               style={{
@@ -285,92 +301,132 @@ const uniqueName = () => {
               Back
             </Text>
           </TouchableOpacity> */}
-        </View>
+      </View>
 
-        <View style={styles.body}>
-          <View style={styles.container}>
-            <TouchableOpacity
-              style={styles.groupImageContainer}
-              onPress={()=> {pickImage()}}
-            >
-              
-              {profilePhotoURL ? (
-                <Image style={styles.groupImage} source={{ uri: profilePhotoURL }} />
-              ) : (
-                <>
-                  <Icon name="image-outline" size={40} color="#919191" />
-                </>
-              )}
-            </TouchableOpacity>
-            {/* <Text style={{ marginBottom: 10, textAlign: "center" }}>
-              Select Group Profile Image
-            </Text> */}
-            <Text style={styles.label}>Group Name</Text>
-            <TextInput
-              style={styles.inputField}
-              placeholder="Enter group name"
-              value={addData}
-              onChangeText={(Name) => setAddData(Name)}
-            />
-
-            <MultiSelect
-            hideTags
-              items={userDocs}
-              uniqueKey="userId"
-              onSelectedItemsChange={setSelectedItems}
-              selectedItems={selectedItems}
-              selectText="Search participants to add"
-              searchInputPlaceholderText="Search options..."
-              searchInputStyle={{ borderRadius: 5 , height:60}}
-              tagRemoveIconColor="#616161"
-              tagBorderColor="#616161"
-              tagTextColor="#616161"
-              selectedItemTextColor="#616161"
-              selectedItemIconColor="#616161"
-              itemTextColor="grey"
-              displayKey="first_name"
-              hideSubmitButton={false}
-              onToggleList = {()=>{setShowTags(!showTags)}}
-            />
-
-       {!isDisappearingGroup && showTags &&  <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{maxHeight:65,marginTop:5}}>
-                {selectedItems.map((item) => (
-                  (<View key={item} style={{paddingVertical:10,paddingHorizontal:15, borderWidth:1, borderColor:'#616161', marginRight:15, borderRadius:20, maxHeight:40, alignItems:'center',display:'flex', justifyContent:'center'}}>
-                  <Text  style={{ fontSize:16, color:'#616161' }}>
-                    {userDocs.find((option) => option.userId === item).first_name}
-                  </Text></View>)
-                ))}
-          </ScrollView>}
-
-
-            <View style={styles.disapper}>
-              <Text style={styles.label}>Disappearing Group</Text>
-              <Switch
-                value={isDisappearingGroup}
-                onValueChange={setIsDisappearingGroup}
-              />
-            </View>
-            {isDisappearingGroup ? (
-              <RNDateTimePicker
-                value={new Date(selectedDate)}
-                display={Platform.OS == "ios" ? "spinner" : "calendar"}
-                mode="date"
-                style={styles.rnd}
-                minimumDate={new Date()}
-                onChange={(event, date) => handleDateChange(date)}
+      <View style={styles.body}>
+        <View style={styles.container}>
+          <TouchableOpacity
+            style={styles.groupImageContainer}
+            onPress={() => {
+              pickImage();
+            }}
+          >
+            {profilePhotoURL ? (
+              <Image
+                style={styles.groupImage}
+                source={{ uri: profilePhotoURL }}
               />
             ) : (
-              ""
+              <>
+                <Icon name="image-outline" size={40} color="#919191" />
+              </>
             )}
+          </TouchableOpacity>
+          {/* <Text style={{ marginBottom: 10, textAlign: "center" }}>
+              Select Group Profile Image
+            </Text> */}
+          <Text style={styles.label}>Group Name</Text>
+          <TextInput
+            style={styles.inputField}
+            placeholder="Enter group name"
+            value={addData}
+            onChangeText={(Name) => setAddData(Name)}
+          />
 
-            <TouchableOpacity
-              style={styles.createGroupButton}
-              onPress={handleCreateGroup}
+          <MultiSelect
+            hideTags
+            items={userDocs}
+            uniqueKey="userId"
+            onSelectedItemsChange={setSelectedItems}
+            selectedItems={selectedItems}
+            selectText="Search participants to add"
+            searchInputPlaceholderText="Search options..."
+            searchInputStyle={{ borderRadius: 5, height: 60 }}
+            tagRemoveIconColor="#616161"
+            tagBorderColor="#616161"
+            tagTextColor="#616161"
+            selectedItemTextColor="#616161"
+            selectedItemIconColor="#616161"
+            itemTextColor="grey"
+            displayKey="first_name"
+            hideSubmitButton={false}
+            onToggleList={() => {
+              setShowTags(!showTags);
+            }}
+          />
+
+          {!isDisappearingGroup && showTags && (
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              style={{ maxHeight: 65, marginTop: 5 }}
             >
-              <Text style={styles.createGroupButtonText}>Create Group</Text>
-            </TouchableOpacity>
+              {selectedItems.map((item) => (
+                <View
+                  key={item}
+                  style={{
+                    paddingVertical: 10,
+                    paddingHorizontal: 15,
+                    borderWidth: 1,
+                    borderColor: "#616161",
+                    marginRight: 15,
+                    borderRadius: 20,
+                    maxHeight: 40,
+                    alignItems: "center",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ fontSize: 16, color: "#616161" }}>
+                    {
+                      userDocs.find((option) => option.userId === item)
+                        .first_name
+                    }
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+
+          <View style={styles.disapper}>
+            <Text style={styles.label}>Disappearing Group</Text>
+            <Switch
+              value={isDisappearingGroup}
+              onValueChange={() => {
+                setIsDisappearingGroup(!isDisappearingGroup);
+              }}
+            />
+            {Platform.OS == "android" && isDisappearingGroup && (
+              <TouchableOpacity
+                onPress={() => {
+                  setShowDatePicker(!showDatePicker);
+                }}
+              >
+                <Text>{selectedDate.toDateString()}</Text>
+              </TouchableOpacity>
+            )}
           </View>
+          {isDisappearingGroup && showDatePicker ? (
+            <RNDateTimePicker
+              value={new Date(selectedDate)}
+              display={Platform.OS == "ios" ? "spinner" : "calendar"}
+              mode="date"
+              style={styles.rnd}
+              minimumDate={new Date()}
+              onChange={(event, date) => handleDateChange(date)}
+            />
+          ) : (
+            ""
+          )}
+
+          <TouchableOpacity
+            style={styles.createGroupButton}
+            onPress={handleCreateGroup}
+          >
+            <Text style={styles.createGroupButtonText}>Create Group</Text>
+          </TouchableOpacity>
         </View>
+      </View>
     </SafeAreaView>
   );
 };
